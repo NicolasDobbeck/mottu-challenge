@@ -1,4 +1,3 @@
-// src/screens/Login.tsx
 import React, { useState } from 'react';
 import {
   View,
@@ -6,8 +5,11 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Image
+  Image,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
+import { useMutation } from '@tanstack/react-query';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface LoginProps {
@@ -22,7 +24,24 @@ const LoginScreen: React.FC<LoginProps> = ({ onLogin }) => {
   const [emailError, setEmailError] = useState('');
   const [senhaError, setSenhaError] = useState('');
 
-  const handleLogin = async () => {
+  const loginMutation = useMutation({
+    mutationFn: async ({ userEmail, userNome }: { userEmail: string; userNome: string }) => {
+      if (!userEmail.trim() || !userNome.trim()) {
+        throw new Error('Email e nome social são obrigatórios');
+      }
+      await AsyncStorage.setItem('userEmail', userEmail);
+      await AsyncStorage.setItem('userNomeSocial', userNome);
+    },
+    onSuccess: () => {
+      onLogin();
+    },
+    onError: (error: any) => {
+      console.error('Erro ao salvar os dados:', error);
+      Alert.alert('Erro', 'Falha ao processar login. Tente novamente.');
+    },
+  });
+
+  const handleLogin = () => {
     let hasError = false;
     setNomeError('');
     setEmailError('');
@@ -43,14 +62,8 @@ const LoginScreen: React.FC<LoginProps> = ({ onLogin }) => {
       hasError = true;
     }
 
-    if (!hasError) {
-      try {
-        await AsyncStorage.setItem('userEmail', email);
-        await AsyncStorage.setItem('userNomeSocial', nomeSocial);
-        onLogin();  // só chama a função passada, sem usar navegação aqui
-      } catch (error) {
-        console.error('Erro ao salvar os dados:', error);
-      }
+    if (!hasError && !loginMutation.isPending) {
+      loginMutation.mutate({ userEmail: email, userNome: nomeSocial });
     }
   };
 
@@ -68,6 +81,7 @@ const LoginScreen: React.FC<LoginProps> = ({ onLogin }) => {
         placeholderTextColor="#999"
         value={nomeSocial}
         onChangeText={setNomeSocial}
+        editable={!loginMutation.isPending}
       />
       {nomeError ? <Text style={styles.errorText}>{nomeError}</Text> : null}
 
@@ -79,6 +93,7 @@ const LoginScreen: React.FC<LoginProps> = ({ onLogin }) => {
         onChangeText={setEmail}
         autoCapitalize="none"
         keyboardType="email-address"
+        editable={!loginMutation.isPending}
       />
       {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
 
@@ -89,11 +104,23 @@ const LoginScreen: React.FC<LoginProps> = ({ onLogin }) => {
         secureTextEntry
         value={senha}
         onChangeText={setSenha}
+        editable={!loginMutation.isPending}
       />
       {senhaError ? <Text style={styles.errorText}>{senhaError}</Text> : null}
 
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Entrar</Text>
+      <TouchableOpacity 
+        style={[
+          styles.button, 
+          loginMutation.isPending && styles.disabledButton
+        ]} 
+        onPress={handleLogin}
+        disabled={loginMutation.isPending}
+      >
+        {loginMutation.isPending ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.buttonText}>Entrar</Text>
+        )}
       </TouchableOpacity>
     </View>
   );
@@ -146,11 +173,17 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginTop: 20,
     width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   buttonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
     textAlign: 'center',
+  },
+  disabledButton: {
+    backgroundColor: '#ccc',
+    opacity: 0.7,
   },
 });

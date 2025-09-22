@@ -1,21 +1,64 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useQuery } from '@tanstack/react-query';
+import { queryClient } from '../react-query';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Home() {
   const navigation = useNavigation();
-  const [nomeSocial, setNomeSocial] = useState<string | null>(null);
 
-  useEffect(() => {
-    const loadNomeSocial = async () => {
+  const { data: nomeSocial, isLoading, isError, error } = useQuery({
+    queryKey: ['userNomeSocial'],
+    queryFn: async () => {
       const nome = await AsyncStorage.getItem('userNomeSocial');
-      setNomeSocial(nome);
-    };
+      if (!nome) throw new Error('Nome social não encontrado');
+      return nome;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
 
-    loadNomeSocial();
-  }, []);
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.topContainer}>
+          <ActivityIndicator size="large" color="#05AF31" />
+          <Text style={styles.subtitle}>Carregando...</Text>
+        </View>
+        <View style={styles.imageContainer}>
+          <Image
+            source={require('../assets/background.png')}
+            style={styles.image}
+            resizeMode="contain"
+          />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (isError) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.topContainer}>
+          <Text style={styles.subtitle}>Erro ao carregar nome: {error?.message}</Text>
+        </View>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => queryClient.invalidateQueries({ queryKey: ['userNomeSocial'] })}
+        >
+          <Text style={styles.buttonText}>Tentar Novamente</Text>
+        </TouchableOpacity>
+        <View style={styles.imageContainer}>
+          <Image
+            source={require('../assets/background.png')}
+            style={styles.image}
+            resizeMode="contain"
+          />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>

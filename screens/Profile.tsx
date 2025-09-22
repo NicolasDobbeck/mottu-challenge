@@ -7,9 +7,11 @@ import {
   Image,
   StyleSheet,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { useNavigation } from "@react-navigation/native";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface ProfileProps {
@@ -18,11 +20,27 @@ interface ProfileProps {
 
 export default function Profile({ onLogout }: ProfileProps) {
   const navigation = useNavigation<any>();
+  const queryClient = useQueryClient();
 
   const [senha, setSenha] = useState("");
   const [avatarUri, setAvatarUri] = useState(
     "https://cdn-icons-png.flaticon.com/512/20/20162.png"
   );
+
+  const savePasswordMutation = useMutation({
+    mutationFn: async (newPassword: string) => {
+      if (!newPassword.trim()) throw new Error('Senha não pode estar vazia');
+      await AsyncStorage.setItem("userPassword", newPassword);
+    },
+    onSuccess: () => {
+      Alert.alert("Sucesso", "Alterações salvas");
+      queryClient.invalidateQueries({ queryKey: ['userPassword'] }); // Invalida cache se houver query para senha
+      navigation.navigate("Home");
+    },
+    onError: (error: any) => {
+      Alert.alert("Erro", `Não foi possível salvar as alterações: ${error.message}`);
+    },
+  });
 
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -50,7 +68,7 @@ export default function Profile({ onLogout }: ProfileProps) {
     <View style={styles.container}>
       <Text style={styles.title}>Perfil</Text>
 
-      <TouchableOpacity onPress={pickImage} style={styles.avatarContainer}>
+      <TouchableOpacity onPress={pickImage} style={styles.avatarContainer} disabled={savePasswordMutation.isPending}>
         <Image source={{ uri: avatarUri }} style={styles.avatar} />
         <Text style={styles.editText}>Trocar Foto</Text>
       </TouchableOpacity>
@@ -62,24 +80,25 @@ export default function Profile({ onLogout }: ProfileProps) {
         style={styles.input}
         value={senha}
         onChangeText={setSenha}
+        editable={!savePasswordMutation.isPending}
       />
 
       <TouchableOpacity
-        style={styles.button}
-        onPress={async () => {
-          try {
-            await AsyncStorage.setItem("userPassword", senha);
-            Alert.alert("Sucesso", "Alterações salvas");
-            navigation.navigate("Home");
-          } catch (error) {
-            Alert.alert("Erro", "Não foi possível salvar as alterações.");
-          }
-        }}
+        style={[
+          styles.button,
+          savePasswordMutation.isPending && styles.disabledButton
+        ]}
+        onPress={() => savePasswordMutation.mutate(senha)}
+        disabled={savePasswordMutation.isPending}
       >
-        <Text style={styles.buttonText}>Salvar Alterações</Text>
+        {savePasswordMutation.isPending ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.buttonText}>Salvar Alterações</Text>
+        )}
       </TouchableOpacity>
 
-      <TouchableOpacity style={[styles.button, styles.logoutButton]} onPress={onLogout}>
+      <TouchableOpacity style={[styles.button, styles.logoutButton]} onPress={onLogout} disabled={savePasswordMutation.isPending}>
         <Text style={styles.buttonText}>Logout</Text>
       </TouchableOpacity>
     </View>
@@ -131,6 +150,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginTop: 10,
     width: "100%",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   buttonText: {
     color: "#fff",
@@ -141,5 +162,9 @@ const styles = StyleSheet.create({
   logoutButton: {
     backgroundColor: "#890e08",
     marginTop: 20,
+  },
+  disabledButton: {
+    backgroundColor: '#ccc',
+    opacity: 0.7,
   },
 });
