@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, ActivityIndicator } fr
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useQuery } from '@tanstack/react-query';
-import { queryClient } from '../react-query';
+import { queryClient } from '../../react-query';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Home() {
@@ -28,7 +28,7 @@ export default function Home() {
         </View>
         <View style={styles.imageContainer}>
           <Image
-            source={require('../assets/background.png')}
+            source={require('../../assets/background.png')}
             style={styles.image}
             resizeMode="contain"
           />
@@ -51,7 +51,7 @@ export default function Home() {
         </TouchableOpacity>
         <View style={styles.imageContainer}>
           <Image
-            source={require('../assets/background.png')}
+            source={require('../../assets/background.png')}
             style={styles.image}
             resizeMode="contain"
           />
@@ -79,7 +79,7 @@ export default function Home() {
 
       <View style={styles.imageContainer}>
         <Image
-          source={require('../assets/background.png')}
+          source={require('../../assets/background.png')}
           style={styles.image}
           resizeMode="contain"
         />

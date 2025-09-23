@@ -11,11 +11,7 @@ import Profile from '../screens/Profile';
 
 const Tab = createBottomTabNavigator();
 
-interface TabsProps {
-  onLogout: () => void;
-}
-
-export default function Tabs({ onLogout }: TabsProps) {
+export default function Tabs({ onLogout }: { onLogout: () => void }) {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({

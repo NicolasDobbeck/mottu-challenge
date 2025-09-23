@@ -3,7 +3,8 @@ module.exports = function (api) {
   return {
     presets: ['babel-preset-expo'],
     plugins: [
-      require('react-native-worklets-core/plugin'),
+      'react-native-worklets/plugin',
+      '@babel/plugin-transform-optional-chaining',
     ],
   };
 };

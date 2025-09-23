@@ -1,3 +1,4 @@
+// src/screens/Profile.tsx
 import React, { useState } from "react";
 import {
   View,
@@ -10,37 +11,51 @@ import {
   ActivityIndicator,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import { useNavigation } from "@react-navigation/native";
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { auth } from "../config/firebaseConfig";
+import { logoutUser, changeUserPassword } from "../services/authService";
 
 interface ProfileProps {
   onLogout: () => void;
 }
 
 export default function Profile({ onLogout }: ProfileProps) {
-  const navigation = useNavigation<any>();
-  const queryClient = useQueryClient();
-
   const [senha, setSenha] = useState("");
+  const [loading, setLoading] = useState(false);
   const [avatarUri, setAvatarUri] = useState(
     "https://cdn-icons-png.flaticon.com/512/20/20162.png"
   );
 
-  const savePasswordMutation = useMutation({
-    mutationFn: async (newPassword: string) => {
-      if (!newPassword.trim()) throw new Error('Senha não pode estar vazia');
-      await AsyncStorage.setItem("userPassword", newPassword);
-    },
-    onSuccess: () => {
-      Alert.alert("Sucesso", "Alterações salvas");
-      queryClient.invalidateQueries({ queryKey: ['userPassword'] }); // Invalida cache se houver query para senha
-      navigation.navigate("Home");
-    },
-    onError: (error: any) => {
-      Alert.alert("Erro", `Não foi possível salvar as alterações: ${error.message}`);
-    },
-  });
+  const user = auth.currentUser;
+
+  const handleUpdatePassword = async () => {
+    if (!user) {
+      Alert.alert("Erro", "Nenhum usuário autenticado.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await changeUserPassword(user, senha);
+      Alert.alert("Sucesso", "Senha alterada com sucesso!");
+      setSenha("");
+      // Navegação para a Home, se desejar
+      // navigation.navigate("Home"); 
+    } catch (error: any) {
+      console.error(error);
+      Alert.alert("Erro", error.message || "Não foi possível alterar a senha.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logoutUser();
+      onLogout(); // Chama a função para atualizar o estado no App.tsx
+    } catch (error: any) {
+      Alert.alert("Erro", error.message || "Não foi possível sair.");
+    }
+  };
 
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -68,10 +83,14 @@ export default function Profile({ onLogout }: ProfileProps) {
     <View style={styles.container}>
       <Text style={styles.title}>Perfil</Text>
 
-      <TouchableOpacity onPress={pickImage} style={styles.avatarContainer} disabled={savePasswordMutation.isPending}>
+      <TouchableOpacity onPress={pickImage} style={styles.avatarContainer} disabled={loading}>
         <Image source={{ uri: avatarUri }} style={styles.avatar} />
         <Text style={styles.editText}>Trocar Foto</Text>
       </TouchableOpacity>
+
+      {user?.displayName && (
+        <Text style={styles.nameText}>{user.displayName}</Text>
+      )}
 
       <TextInput
         placeholder="Digite sua nova senha"
@@ -80,25 +99,26 @@ export default function Profile({ onLogout }: ProfileProps) {
         style={styles.input}
         value={senha}
         onChangeText={setSenha}
-        editable={!savePasswordMutation.isPending}
+        editable={!loading}
       />
 
       <TouchableOpacity
-        style={[
-          styles.button,
-          savePasswordMutation.isPending && styles.disabledButton
-        ]}
-        onPress={() => savePasswordMutation.mutate(senha)}
-        disabled={savePasswordMutation.isPending}
+        style={[styles.button, loading && styles.disabledButton]}
+        onPress={handleUpdatePassword}
+        disabled={loading}
       >
-        {savePasswordMutation.isPending ? (
+        {loading ? (
           <ActivityIndicator color="#fff" />
         ) : (
           <Text style={styles.buttonText}>Salvar Alterações</Text>
         )}
       </TouchableOpacity>
 
-      <TouchableOpacity style={[styles.button, styles.logoutButton]} onPress={onLogout} disabled={savePasswordMutation.isPending}>
+      <TouchableOpacity
+        style={[styles.button, styles.logoutButton]}
+        onPress={handleLogout}
+        disabled={loading}
+      >
         <Text style={styles.buttonText}>Logout</Text>
       </TouchableOpacity>
     </View>
@@ -120,7 +140,7 @@ const styles = StyleSheet.create({
   },
   avatarContainer: {
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: 10,
   },
   avatar: {
     width: 100,
@@ -133,6 +153,12 @@ const styles = StyleSheet.create({
   editText: {
     fontSize: 14,
     color: "#05AF31",
+  },
+  nameText: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 20,
+    color: "#333",
   },
   input: {
     width: "100%",
@@ -150,8 +176,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginTop: 10,
     width: "100%",
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   buttonText: {
     color: "#fff",
@@ -164,7 +190,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   disabledButton: {
-    backgroundColor: '#ccc',
+    backgroundColor: "#ccc",
     opacity: 0.7,
   },
 });

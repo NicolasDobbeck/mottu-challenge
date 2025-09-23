@@ -7,17 +7,17 @@ export default function Developers() {
     <ScrollView contentContainerStyle={styles.container}>
       <DevCard
         name="Nicolas Dobbeck"
-        image={require('../assets/nicolas.jpg')}
+        image={require('../../assets/nicolas.jpg')}
         github="https://github.com/NicolasDobbeck"
       />
       <DevCard
         name="José Bezerra"
-        image={require('../assets/jose.jpg')}
+        image={require('../../assets/jose.jpg')}
         github="https://github.com/jjosebastos"
       />
       <DevCard
         name="Thiago Henry"
-        image={require('../assets/thiago.png')}
+        image={require('../../assets/thiago.png')}
         github="https://github.com/lavithiluan"
       />
     </ScrollView>
