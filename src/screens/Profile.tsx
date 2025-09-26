@@ -6,13 +6,18 @@ import {
   Alert,
   ScrollView,
   TouchableOpacity,
-  ImageSourcePropType,
 } from "react-native";
-import * as ImagePicker from "expo-image-picker";
+import { useNavigation } from "@react-navigation/native";
 import { auth } from "../config/firebaseConfig";
 import { logoutUser } from "../services/authService";
-import { useTheme, Button, Text, List, Surface } from "react-native-paper";
-import { useNavigation } from "@react-navigation/native"; 
+import {
+  useTheme,
+  Button,
+  Text,
+  List,
+  Surface,
+  Menu,
+} from "react-native-paper";
 
 interface ProfileProps {
   onLogout: () => void;
@@ -24,18 +29,40 @@ const DefaultRemoteAvatar = "https://cdn-icons-png.flaticon.com/512/20/20162.png
 
 export default function Profile({ onLogout, toggleTheme }: ProfileProps) {
   const theme = useTheme();
-  const navigation = useNavigation();
-  const [loading, setLoading] = useState(false);
-
-  const [avatarSource, setAvatarSource] = useState<string | ImageSourcePropType>(DefaultRemoteAvatar);
+  const navigation = useNavigation()
 
   const user = auth.currentUser;
-  
+  const [loading, setLoading] = useState(false);
+  const [idiomaMenuVisible, setIdiomaMenuVisible] = useState(false);
+
+  // Estado do Avatar: Tentativa de usar a foto atual do Firebase ou a remota padrão
+  const [avatarSource, setAvatarSource] = useState(
+    user?.photoURL || DefaultRemoteAvatar
+  );
+
+  // 1.Lista de itens de menu refatorada para navegação
   const listItems = [
     { id: 'conta', icon: 'account-cog', title: 'Conta', description: 'Altere seus dados pessoais e senha.' },
     { id: 'tema', icon: theme.dark ? "white-balance-sunny" : "weather-night", title: 'Tema', description: `Modo atual: ${theme.dark ? 'Escuro' : 'Claro'}` },
-    { id: 'idioma', icon: 'translate', title: 'Idioma', description: 'Selecione o idioma do aplicativo.' },
+    { id: 'idioma', icon: 'translate', title: 'Idioma', description: 'Português (Brasil)' },
   ];
+  
+  const handleListItemPress = (id: string) => {
+    switch (id) {
+      case 'tema':
+        toggleTheme();
+        break;
+      case 'conta':
+        navigation.navigate('AccountSettings' as never); 
+        break;
+      case 'idioma':
+        setIdiomaMenuVisible(true);
+        break;
+      default:
+        Alert.alert("Ação:", `Navegar para a tela de ${id}.`);
+        break;
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -45,41 +72,7 @@ export default function Profile({ onLogout, toggleTheme }: ProfileProps) {
       Alert.alert("Erro", error.message || "Não foi possível sair.");
     }
   };
-
-  const pickImage = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== "granted") {
-      Alert.alert("Permissão negada", "É necessário permitir o acesso à galeria.");
-      return;
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 1,
-    });
-
-    if (!result.canceled && result.assets && result.assets.length > 0) {
-      setAvatarSource(result.assets[0].uri);
-    }
-  };
-
-  const handleListItemPress = (id: string) => {
-    switch (id) {
-      case 'tema':
-        toggleTheme();
-        break;
-      case 'conta':
-        Alert.alert("Ação: Conta", "Navegar para a tela de Configurações da Conta.");
-        break;
-      default:
-        Alert.alert("Ação:", `Navegar para a tela de ${id}.`);
-        break;
-    }
-  };
   
-  // Criação dinâmica dos estilos usando o tema
   const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -88,7 +81,7 @@ export default function Profile({ onLogout, toggleTheme }: ProfileProps) {
     header: {
       alignItems: 'center',
       padding: 30,
-      backgroundColor: theme.colors.surface,
+      backgroundColor: theme.colors.surface, 
     },
     avatarContainer: {
       alignItems: "center",
@@ -115,9 +108,8 @@ export default function Profile({ onLogout, toggleTheme }: ProfileProps) {
         marginTop: 10,
         marginHorizontal: 16,
     },
-    // Estilo de Card
     listItemCard: {
-        backgroundColor: theme.colors.surfaceVariant,
+        backgroundColor: theme.colors.surfaceVariant, 
         borderRadius: 20, 
         marginBottom: 10,
         overflow: 'hidden',
@@ -133,18 +125,16 @@ export default function Profile({ onLogout, toggleTheme }: ProfileProps) {
   
   const finalImageSource = avatarSource === DefaultRemoteAvatar ? LocalDefaultAvatar : imageSource;
 
-
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <Text variant="headlineMedium" style={{ color: theme.colors.onSurface }}>
             Perfil
         </Text>
-
-        <TouchableOpacity onPress={pickImage} style={styles.avatarContainer} disabled={loading}>
+        
+        <View style={styles.avatarContainer}>
           <Image source={finalImageSource} style={styles.avatar} />
-          <Text variant="bodyMedium" style={styles.editText}>Trocar Foto</Text>
-        </TouchableOpacity>
+        </View>
 
         <Text variant="titleLarge" style={styles.nameText}>{user?.displayName || "Usuário Mottu"}</Text>
         <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceDisabled }}>{user?.email || "email@mottu.com"}</Text>
@@ -154,16 +144,42 @@ export default function Profile({ onLogout, toggleTheme }: ProfileProps) {
       <View style={styles.listSection}>
         <List.Section title="Configurações" titleStyle={{ color: theme.colors.onSurface }}>
             {listItems.map((item, index) => (
-                <Surface key={index} style={styles.listItemCard} elevation={2}>
-                    <List.Item
-                        title={item.title}
-                        description={item.description}
-                        descriptionStyle={{ color: theme.colors.onSurfaceDisabled }}
-                        left={props => <List.Icon {...props} icon={item.icon} color={theme.colors.primary} />}
-                        onPress={() => handleListItemPress(item.id)}
-                        style={styles.listItem}
-                    />
-                </Surface>
+                item.id === 'idioma' ? (
+                    <Menu
+                        key={item.id}
+                        visible={idiomaMenuVisible}
+                        onDismiss={() => setIdiomaMenuVisible(false)}
+                        anchor={
+                            <Surface style={styles.listItemCard} elevation={2}>
+                                <List.Item
+                                    title={item.title}
+                                    description={item.description}
+                                    descriptionStyle={{ color: theme.colors.onSurfaceDisabled }}
+                                    left={props => <List.Icon {...props} icon={item.icon} color={theme.colors.primary} />}
+                                    onPress={() => handleListItemPress(item.id)}
+                                    style={styles.listItem}
+                                />
+                            </Surface>
+                        }
+                    >
+                        {/* Itens do Dropdown de Idioma */}
+                        <Menu.Item onPress={() => { Alert.alert("Idioma", "Português selecionado"); setIdiomaMenuVisible(false); }} title="Português (BR)" />
+                        <Menu.Item onPress={() => { Alert.alert("Idioma", "Espanhol selecionado"); setIdiomaMenuVisible(false); }} title="Español" />
+                        <Menu.Item onPress={() => { Alert.alert("Idioma", "Inglês selecionado"); setIdiomaMenuVisible(false); }} title="English" />
+                    </Menu>
+                ) : (
+                    <Surface key={item.id} style={styles.listItemCard} elevation={2}>
+                        <List.Item
+                            title={item.title}
+                            description={item.description}
+                            descriptionStyle={{ color: theme.colors.onSurfaceDisabled }}
+                            left={props => <List.Icon {...props} icon={item.icon} color={theme.colors.primary} />}
+                            onPress={() => handleListItemPress(item.id)}
+                            style={styles.listItem}
+                            right={props => <List.Icon {...props} icon="chevron-right" />}
+                        />
+                    </Surface>
+                )
             ))}
         </List.Section>
       </View>

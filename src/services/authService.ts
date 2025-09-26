@@ -2,13 +2,15 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
-  updateProfile,
+  updateProfile, 
   updatePassword,
   User,
+  UserProfile,
 } from "firebase/auth";
-import { doc, setDoc, getDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
 import { auth, db } from "../config/firebaseConfig";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 // Criar usuário (registro)
 export async function registerUser(email: string, password: string, displayName: string) {
@@ -76,4 +78,36 @@ export async function logoutUser() {
 export async function changeUserPassword(user: User, newPassword: string) {
   if (!newPassword.trim()) throw new Error("Senha não pode estar vazia");
   await updatePassword(user, newPassword);
+}
+
+export async function updateUserProfile(user: User, updates: { displayName?: string, photoURL?: string }) {
+  if (!user) throw new Error("Usuário não autenticado.");
+
+  const { displayName, photoURL } = updates;
+
+  try {
+    // 1. Atualiza o perfil no Firebase Auth (displayName e photoURL)
+    await updateProfile(user, { displayName, photoURL });
+
+    // 2. Atualiza o Firestore (Nome Social e salva no AsyncStorage)
+    const userDocRef = doc(db, "users", user.uid);
+    const firestoreUpdates: { nomeSocial?: string } = {};
+
+    if (displayName) {
+      firestoreUpdates.nomeSocial = displayName;
+      await AsyncStorage.setItem('userNomeSocial', displayName);
+    }
+    
+    // Se houver campos para atualizar no Firestore, chame updateDoc
+    if (Object.keys(firestoreUpdates).length > 0) {
+        await updateDoc(userDocRef, firestoreUpdates);
+    }
+
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error(String(error));
+    }
+  }
 }
