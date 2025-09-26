@@ -1,57 +1,46 @@
-// src/screens/Profile.tsx
 import React, { useState } from "react";
 import {
   View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Image,
   StyleSheet,
+  Image,
   Alert,
-  ActivityIndicator,
+  ScrollView,
+  TouchableOpacity,
+  ImageSourcePropType,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { auth } from "../config/firebaseConfig";
-import { logoutUser, changeUserPassword } from "../services/authService";
+import { logoutUser } from "../services/authService";
+import { useTheme, Button, Text, List, Surface } from "react-native-paper";
+import { useNavigation } from "@react-navigation/native"; 
 
 interface ProfileProps {
   onLogout: () => void;
+  toggleTheme: () => void;
 }
 
-export default function Profile({ onLogout }: ProfileProps) {
-  const [senha, setSenha] = useState("");
+const LocalDefaultAvatar = require('../../assets/generic-avatar.png'); 
+const DefaultRemoteAvatar = "https://cdn-icons-png.flaticon.com/512/20/20162.png";
+
+export default function Profile({ onLogout, toggleTheme }: ProfileProps) {
+  const theme = useTheme();
+  const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
-  const [avatarUri, setAvatarUri] = useState(
-    "https://cdn-icons-png.flaticon.com/512/20/20162.png"
-  );
+
+  const [avatarSource, setAvatarSource] = useState<string | ImageSourcePropType>(DefaultRemoteAvatar);
 
   const user = auth.currentUser;
-
-  const handleUpdatePassword = async () => {
-    if (!user) {
-      Alert.alert("Erro", "Nenhum usuário autenticado.");
-      return;
-    }
-
-    try {
-      setLoading(true);
-      await changeUserPassword(user, senha);
-      Alert.alert("Sucesso", "Senha alterada com sucesso!");
-      setSenha("");
-      // Navegação para a Home, se desejar
-      // navigation.navigate("Home"); 
-    } catch (error: any) {
-      console.error(error);
-      Alert.alert("Erro", error.message || "Não foi possível alterar a senha.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  
+  const listItems = [
+    { id: 'conta', icon: 'account-cog', title: 'Conta', description: 'Altere seus dados pessoais e senha.' },
+    { id: 'tema', icon: theme.dark ? "white-balance-sunny" : "weather-night", title: 'Tema', description: `Modo atual: ${theme.dark ? 'Escuro' : 'Claro'}` },
+    { id: 'idioma', icon: 'translate', title: 'Idioma', description: 'Selecione o idioma do aplicativo.' },
+  ];
 
   const handleLogout = async () => {
     try {
       await logoutUser();
-      onLogout(); // Chama a função para atualizar o estado no App.tsx
+      onLogout();
     } catch (error: any) {
       Alert.alert("Erro", error.message || "Não foi possível sair.");
     }
@@ -60,10 +49,7 @@ export default function Profile({ onLogout }: ProfileProps) {
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
-      Alert.alert(
-        "Permissão negada",
-        "É necessário permitir o acesso à galeria para alterar a imagem de perfil."
-      );
+      Alert.alert("Permissão negada", "É necessário permitir o acesso à galeria.");
       return;
     }
 
@@ -75,122 +61,126 @@ export default function Profile({ onLogout }: ProfileProps) {
     });
 
     if (!result.canceled && result.assets && result.assets.length > 0) {
-      setAvatarUri(result.assets[0].uri);
+      setAvatarSource(result.assets[0].uri);
     }
   };
 
+  const handleListItemPress = (id: string) => {
+    switch (id) {
+      case 'tema':
+        toggleTheme();
+        break;
+      case 'conta':
+        Alert.alert("Ação: Conta", "Navegar para a tela de Configurações da Conta.");
+        break;
+      default:
+        Alert.alert("Ação:", `Navegar para a tela de ${id}.`);
+        break;
+    }
+  };
+  
+  // Criação dinâmica dos estilos usando o tema
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    header: {
+      alignItems: 'center',
+      padding: 30,
+      backgroundColor: theme.colors.surface,
+    },
+    avatarContainer: {
+      alignItems: "center",
+      marginBottom: 10,
+    },
+    avatar: {
+      width: 120,
+      height: 120,
+      borderRadius: 60,
+      marginBottom: 8,
+      borderWidth: 3,
+      borderColor: theme.colors.primary,
+    },
+    editText: {
+      color: theme.colors.primary,
+    },
+    nameText: {
+      marginTop: 8,
+      fontSize: 20,
+      fontWeight: "600",
+      color: theme.colors.onSurface,
+    },
+    listSection: {
+        marginTop: 10,
+        marginHorizontal: 16,
+    },
+    // Estilo de Card
+    listItemCard: {
+        backgroundColor: theme.colors.surfaceVariant,
+        borderRadius: 20, 
+        marginBottom: 10,
+        overflow: 'hidden',
+    },
+    listItem: {
+        paddingHorizontal: 0,
+    },
+  });
+
+  const imageSource = typeof avatarSource === 'string'
+    ? { uri: avatarSource }
+    : avatarSource;
+  
+  const finalImageSource = avatarSource === DefaultRemoteAvatar ? LocalDefaultAvatar : imageSource;
+
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Perfil</Text>
+    <ScrollView style={styles.container}>
+      <View style={styles.header}>
+        <Text variant="headlineMedium" style={{ color: theme.colors.onSurface }}>
+            Perfil
+        </Text>
 
-      <TouchableOpacity onPress={pickImage} style={styles.avatarContainer} disabled={loading}>
-        <Image source={{ uri: avatarUri }} style={styles.avatar} />
-        <Text style={styles.editText}>Trocar Foto</Text>
-      </TouchableOpacity>
+        <TouchableOpacity onPress={pickImage} style={styles.avatarContainer} disabled={loading}>
+          <Image source={finalImageSource} style={styles.avatar} />
+          <Text variant="bodyMedium" style={styles.editText}>Trocar Foto</Text>
+        </TouchableOpacity>
 
-      {user?.displayName && (
-        <Text style={styles.nameText}>{user.displayName}</Text>
-      )}
+        <Text variant="titleLarge" style={styles.nameText}>{user?.displayName || "Usuário Mottu"}</Text>
+        <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceDisabled }}>{user?.email || "email@mottu.com"}</Text>
+      </View>
+      
+      {/* Lista de Itens (Cards) */}
+      <View style={styles.listSection}>
+        <List.Section title="Configurações" titleStyle={{ color: theme.colors.onSurface }}>
+            {listItems.map((item, index) => (
+                <Surface key={index} style={styles.listItemCard} elevation={2}>
+                    <List.Item
+                        title={item.title}
+                        description={item.description}
+                        descriptionStyle={{ color: theme.colors.onSurfaceDisabled }}
+                        left={props => <List.Icon {...props} icon={item.icon} color={theme.colors.primary} />}
+                        onPress={() => handleListItemPress(item.id)}
+                        style={styles.listItem}
+                    />
+                </Surface>
+            ))}
+        </List.Section>
+      </View>
 
-      <TextInput
-        placeholder="Digite sua nova senha"
-        placeholderTextColor="#999"
-        secureTextEntry
-        style={styles.input}
-        value={senha}
-        onChangeText={setSenha}
-        editable={!loading}
-      />
-
-      <TouchableOpacity
-        style={[styles.button, loading && styles.disabledButton]}
-        onPress={handleUpdatePassword}
-        disabled={loading}
-      >
-        {loading ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={styles.buttonText}>Salvar Alterações</Text>
-        )}
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={[styles.button, styles.logoutButton]}
-        onPress={handleLogout}
-        disabled={loading}
-      >
-        <Text style={styles.buttonText}>Logout</Text>
-      </TouchableOpacity>
-    </View>
+      {/* Botão de Logout */}
+      <View style={{ paddingHorizontal: 16, paddingTop: 10, paddingBottom: 30 }}>
+        <Button
+          mode="contained"
+          onPress={handleLogout}
+          icon="logout"
+          buttonColor={theme.colors.error}
+          style={{ marginBottom: 10, borderRadius: 20 }}
+          disabled={loading}
+        >
+          Logout
+        </Button>
+      </View>
+    </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    padding: 20,
-    backgroundColor: "#fff",
-    alignItems: "center",
-  },
-  title: {
-    fontSize: 28,
-    marginBottom: 30,
-    fontWeight: "bold",
-  },
-  avatarContainer: {
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  avatar: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    marginBottom: 5,
-    borderWidth: 2,
-    borderColor: "#ccc",
-  },
-  editText: {
-    fontSize: 14,
-    color: "#05AF31",
-  },
-  nameText: {
-    fontSize: 18,
-    fontWeight: "600",
-    marginBottom: 20,
-    color: "#333",
-  },
-  input: {
-    width: "100%",
-    borderWidth: 1,
-    borderColor: "#ccc",
-    backgroundColor: "#f9f9f9",
-    borderRadius: 12,
-    padding: 18,
-    marginBottom: 10,
-  },
-  button: {
-    backgroundColor: "#05AF31",
-    paddingVertical: 18,
-    paddingHorizontal: 40,
-    borderRadius: 12,
-    marginTop: 10,
-    width: "100%",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-    textAlign: "center",
-  },
-  logoutButton: {
-    backgroundColor: "#890e08",
-    marginTop: 20,
-  },
-  disabledButton: {
-    backgroundColor: "#ccc",
-    opacity: 0.7,
-  },
-});

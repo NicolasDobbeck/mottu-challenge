@@ -1,8 +1,20 @@
 import React from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
 import DevCard from '../components/DevCard';
+import { useTheme } from 'react-native-paper'; 
 
 export default function Developers() {
+  const theme = useTheme();
+  
+  const styles = StyleSheet.create({
+    container: {
+      padding: 20,
+      alignItems: "center",
+      backgroundColor: theme.colors.background,
+      paddingTop: 80,
+    },
+  });
+  
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <DevCard
@@ -23,12 +35,3 @@ export default function Developers() {
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    alignItems: "center",
-    backgroundColor: "#f2f2f2",
-    paddingTop: 80,
-  },
-});

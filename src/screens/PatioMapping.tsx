@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import {
   View,
-  Text,
   StyleSheet,
   TouchableOpacity,
   Modal,
   ScrollView,
 } from "react-native";
+import { useTheme, Text } from 'react-native-paper'; 
 
 const STATUS_COLORS: Record<string, string> = {
   livre: "#05AF31",
@@ -18,6 +18,7 @@ const statusOptions = ["livre", "problema", "manutencao"];
 const setores = ["Setor A", "Setor B", "Setor C", "Setor D"];
 
 export default function PatioMapping() {
+  const theme = useTheme();
   const [motos, setMotos] = useState(
     Array.from({ length: 100 }, (_, index) => {
       const status =
@@ -40,6 +41,107 @@ export default function PatioMapping() {
     );
     setSelectedMoto(null);
   };
+
+  // 👈 Estilos dinâmicos
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      paddingHorizontal: 25,
+      paddingTop: 60,
+      backgroundColor: theme.colors.background,
+    },
+    title: {
+      fontSize: 24,
+      marginBottom: 20,
+      fontWeight: "bold",
+      textAlign: "center",
+      color: theme.colors.onBackground,
+    },
+    sector: {
+      marginBottom: 30,
+    },
+    sectorTitle: {
+      fontSize: 18,
+      fontWeight: "bold",
+      marginBottom: 10,
+      color: theme.colors.onSurface,
+    },
+    patio: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 10,
+      justifyContent: "center",
+    },
+    bikeSpot: {
+      width: 80,
+      height: 80,
+      margin: 5,
+      borderRadius: 10,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    bikeText: {
+      color: "#fff",
+      fontWeight: "bold",
+    },
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: "rgba(0,0,0,0.6)",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    modalContent: {
+      backgroundColor: theme.colors.surface,
+      padding: 25,
+      borderRadius: 10,
+      width: "85%",
+      elevation: 10,
+    },
+    modalTitle: {
+      fontSize: 20,
+      fontWeight: "bold",
+      marginBottom: 10,
+      textAlign: "center",
+      color: theme.colors.onSurface,
+    },
+    modalText: {
+      fontSize: 16,
+      marginBottom: 5,
+      color: theme.colors.onSurface,
+    },
+    statusButtonsContainer: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      justifyContent: "space-between",
+      gap: 10,
+      marginTop: 10,
+    },
+    statusButton: {
+      paddingVertical: 10,
+      paddingHorizontal: 12,
+      borderRadius: 8,
+      flex: 1,
+      alignItems: "center",
+      minWidth: "30%",
+    },
+    statusButtonText: {
+      color: "#fff",
+      fontWeight: "bold",
+      textTransform: "capitalize",
+    },
+    cancelButton: {
+      marginTop: 20,
+      padding: 12,
+      backgroundColor: theme.colors.backdrop,
+      borderRadius: 8,
+      alignItems: "center",
+    },
+    cancelButtonText: {
+      fontWeight: "bold",
+      color: theme.colors.onBackground,
+    },
+  });
+
 
   return (
     <ScrollView style={styles.container}>
@@ -109,99 +211,3 @@ export default function PatioMapping() {
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: 25,
-    paddingTop: 60,
-    backgroundColor: "#f9f9f9",
-  },
-  title: {
-    fontSize: 24,
-    marginBottom: 20,
-    fontWeight: "bold",
-    textAlign: "center",
-  },
-  sector: {
-    marginBottom: 30,
-  },
-  sectorTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 10,
-    color: "#333",
-  },
-  patio: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 10,
-    justifyContent: "center",
-  },
-  bikeSpot: {
-    width: 80,
-    height: 80,
-    margin: 5,
-    borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  bikeText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.6)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContent: {
-    backgroundColor: "#fff",
-    padding: 25,
-    borderRadius: 10,
-    width: "85%",
-    elevation: 10,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 10,
-    textAlign: "center",
-  },
-  modalText: {
-    fontSize: 16,
-    marginBottom: 5,
-  },
-  statusButtonsContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-    gap: 10,
-    marginTop: 10,
-  },
-  statusButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-    flex: 1,
-    alignItems: "center",
-    minWidth: "30%",
-  },
-  statusButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    textTransform: "capitalize",
-  },
-  cancelButton: {
-    marginTop: 20,
-    padding: 12,
-    backgroundColor: "#ccc",
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  cancelButtonText: {
-    fontWeight: "bold",
-    color: "#333",
-  },
-});

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import {
   View,
-  Text,
   TextInput,
   TouchableOpacity,
   StyleSheet,
@@ -10,13 +9,15 @@ import {
 } from "react-native";
 import { loginUser } from "../services/authService";
 import { useNavigation } from "@react-navigation/native";
-import AsyncStorage from '@react-native-async-storage/async-storage'; // Importe o AsyncStorage
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTheme, Text, Button } from 'react-native-paper'; 
 
 interface LoginProps {
   onLogin: () => void;
 }
 
 const LoginScreen: React.FC<LoginProps> = ({ onLogin }) => {
+  const theme = useTheme();
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [loading, setLoading] = useState(false);
@@ -30,7 +31,6 @@ const LoginScreen: React.FC<LoginProps> = ({ onLogin }) => {
 
     try {
       setLoading(true);
-      // loginUser agora lida com o AsyncStorage, então só precisamos chamá-lo
       await loginUser(email, senha);
       onLogin();
     } catch (error: any) {
@@ -40,14 +40,53 @@ const LoginScreen: React.FC<LoginProps> = ({ onLogin }) => {
     }
   };
 
+  const styles = StyleSheet.create({
+    container: { 
+        flex: 1, 
+        justifyContent: "center", 
+        padding: 20,
+        backgroundColor: theme.colors.background,
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: "bold",
+      marginBottom: 20,
+      textAlign: "center",
+      color: theme.colors.onBackground,
+    },
+    logo: {
+      width: 120,
+      height: 120,
+      alignSelf: "center",
+      marginBottom: 20,
+    },
+    input: {
+      borderWidth: 1,
+      borderColor: theme.colors.outline,
+      padding: 15,
+      marginBottom: 10,
+      borderRadius: 8,
+      backgroundColor: theme.colors.surface,
+      color: theme.colors.onSurface,
+    },
+    button: {
+      backgroundColor: theme.colors.primary,
+      padding: 15,
+      borderRadius: 8,
+      alignItems: "center",
+    },
+    buttonText: { color: theme.colors.onPrimary, fontWeight: "bold" },
+    link: { color: theme.colors.primary, marginTop: 15, textAlign: "center" },
+  });
+
   return (
     <View style={styles.container}>
       <Image source={require("../../assets/logo-mottu.png")} style={styles.logo} />
       <Text style={styles.title}>Login</Text>
-
       <TextInput
         style={styles.input}
         placeholder="Email"
+        placeholderTextColor={theme.colors.onSurfaceDisabled}
         value={email}
         onChangeText={setEmail}
       />
@@ -55,6 +94,7 @@ const LoginScreen: React.FC<LoginProps> = ({ onLogin }) => {
       <TextInput
         style={styles.input}
         placeholder="Senha"
+        placeholderTextColor={theme.colors.onSurfaceDisabled}
         secureTextEntry
         value={senha}
         onChangeText={setSenha}
@@ -80,33 +120,3 @@ const LoginScreen: React.FC<LoginProps> = ({ onLogin }) => {
 };
 
 export default LoginScreen;
-const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "center", padding: 20 },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
-    textAlign: "center",
-  },
-  logo: {
-    width: 120,
-    height: 120,
-    alignSelf: "center",
-    marginBottom: 20,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 15,
-    marginBottom: 10,
-    borderRadius: 8,
-  },
-  button: {
-    backgroundColor: "#05AF31",
-    padding: 15,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  buttonText: { color: "#fff", fontWeight: "bold" },
-  link: { color: "#05AF31", marginTop: 15, textAlign: "center" },
-});

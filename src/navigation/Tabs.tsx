@@ -1,7 +1,7 @@
-// src/navigation/Tabs.tsx
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from 'react-native-paper';
 
 import Home from '../screens/Home';
 import PatioMapping from '../screens/PatioMapping';
@@ -11,7 +11,14 @@ import Profile from '../screens/Profile';
 
 const Tab = createBottomTabNavigator();
 
-export default function Tabs({ onLogout }: { onLogout: () => void }) {
+type TabsProps = {
+  onLogout: () => void;
+  toggleTheme: () => Promise<void> | void;
+};
+
+export default function Tabs({ onLogout, toggleTheme }: TabsProps) {
+  const theme = useTheme();
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -41,10 +48,11 @@ export default function Tabs({ onLogout }: { onLogout: () => void }) {
           return <Ionicons name={iconName} size={size} color={color} />;
         },
         headerShown: false,
-        tabBarActiveTintColor: '#05AF31',
-        tabBarInactiveTintColor: '#9a9a9a',
+        tabBarActiveTintColor: theme.colors.primary,
+        tabBarInactiveTintColor: theme.colors.onSurfaceVariant,
         tabBarStyle: {
-          backgroundColor: '#f9f9f9',
+          backgroundColor: theme.colors.surface,
+          borderTopColor: theme.colors.outlineVariant,
         }
       })}
     >
@@ -53,7 +61,7 @@ export default function Tabs({ onLogout }: { onLogout: () => void }) {
       <Tab.Screen name="Mapa" component={RealtimeMap} />
       <Tab.Screen name="Devs" component={Developers} />
       <Tab.Screen name="Perfil">
-        {() => <Profile onLogout={onLogout} />}
+        {() => <Profile onLogout={onLogout} toggleTheme={toggleTheme} />}
       </Tab.Screen>
     </Tab.Navigator>
   );

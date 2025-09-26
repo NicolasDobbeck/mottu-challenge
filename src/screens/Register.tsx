@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import {
   View,
-  Text,
   TextInput,
   TouchableOpacity,
   StyleSheet,
@@ -11,8 +10,10 @@ import {
 } from "react-native";
 import { registerUser } from "../services/authService";
 import { CommonActions } from '@react-navigation/native';
+import { useTheme, Text, Button } from 'react-native-paper'; 
 
 export default function Register({ navigation }: any) {
+  const theme = useTheme();
   const [nomeSocial, setNomeSocial] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
@@ -43,6 +44,46 @@ export default function Register({ navigation }: any) {
     }
   };
 
+  // 👈 Estilos dinâmicos
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: theme.colors.background,
+      padding: 20,
+    },
+    logo: { width: 120, height: 120, marginBottom: 20, resizeMode: "contain" },
+    title: { 
+        fontSize: 22, 
+        fontWeight: "bold", 
+        marginBottom: 20, 
+        color: theme.colors.onBackground
+    },
+    input: {
+      width: "100%",
+      height: 50,
+      borderColor: theme.colors.outline,
+      borderWidth: 1,
+      borderRadius: 8,
+      paddingHorizontal: 15,
+      marginBottom: 15,
+      backgroundColor: theme.colors.surface,
+      color: theme.colors.onSurface,
+    },
+    button: {
+      width: "100%",
+      height: 50,
+      backgroundColor: theme.colors.primary,
+      borderRadius: 8,
+      justifyContent: "center",
+      alignItems: "center",
+      marginBottom: 15,
+    },
+    buttonText: { color: theme.colors.onPrimary, fontSize: 16, fontWeight: "bold" },
+    linkText: { color: theme.colors.primary, fontSize: 14 },
+  });
+
   return (
     <View style={styles.container}>
       <Image
@@ -51,10 +92,10 @@ export default function Register({ navigation }: any) {
       />
 
       <Text style={styles.title}>Criar Conta</Text>
-
       <TextInput
         style={styles.input}
         placeholder="Nome Social"
+        placeholderTextColor={theme.colors.onSurfaceDisabled}
         value={nomeSocial}
         onChangeText={setNomeSocial}
       />
@@ -62,6 +103,7 @@ export default function Register({ navigation }: any) {
       <TextInput
         style={styles.input}
         placeholder="E-mail"
+        placeholderTextColor={theme.colors.onSurfaceDisabled}
         value={email}
         onChangeText={setEmail}
         autoCapitalize="none"
@@ -71,6 +113,7 @@ export default function Register({ navigation }: any) {
       <TextInput
         style={styles.input}
         placeholder="Senha"
+        placeholderTextColor={theme.colors.onSurfaceDisabled}
         value={senha}
         onChangeText={setSenha}
         secureTextEntry
@@ -82,7 +125,7 @@ export default function Register({ navigation }: any) {
         disabled={loading}
       >
         {loading ? (
-          <ActivityIndicator color="#fff" />
+          <ActivityIndicator color={theme.colors.onPrimary} />
         ) : (
           <Text style={styles.buttonText}>Registrar</Text>
         )}
@@ -94,36 +137,3 @@ export default function Register({ navigation }: any) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#fff",
-    padding: 20,
-  },
-  logo: { width: 120, height: 120, marginBottom: 20, resizeMode: "contain" },
-  title: { fontSize: 22, fontWeight: "bold", marginBottom: 20, color: "#333" },
-  input: {
-    width: "100%",
-    height: 50,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 15,
-    marginBottom: 15,
-    backgroundColor: "#f9f9f9",
-  },
-  button: {
-    width: "100%",
-    height: 50,
-    backgroundColor: "#05AF31",
-    borderRadius: 8,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 15,
-  },
-  buttonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
-  linkText: { color: "#05AF31", fontSize: 14 },
-});
