@@ -10,7 +10,6 @@ import {
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { auth } from "../config/firebaseConfig";
-// ATENÇÃO: Importação corrigida
 import { changeUserPassword, updateUserProfile } from "../services/authService"; 
 import { useTheme, Button, Text, TextInput } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
@@ -23,7 +22,7 @@ export default function AccountSettings() {
   const navigation = useNavigation();
 
   const user = auth.currentUser;
-
+  
   const [nomeSocial, setNomeSocial] = useState(user?.displayName || "");
   const [senha, setSenha] = useState("");
   const [loading, setLoading] = useState(false);
@@ -42,7 +41,6 @@ export default function AccountSettings() {
       setLoading(true);
       let changesMade = false;
 
-      // 1. Atualizar Nome Social
       if (nomeSocial.trim() !== (user.displayName || "")) {
         await updateUserProfile(user, { displayName: nomeSocial.trim() });
         changesMade = true;
@@ -91,7 +89,7 @@ export default function AccountSettings() {
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images, 
       allowsEditing: true,
       aspect: [1, 1],
       quality: 0.7,

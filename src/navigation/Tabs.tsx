@@ -1,15 +1,15 @@
-import React from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from 'react-native-paper';
+import React from "react";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "react-native-paper";
 
-import Home from '../screens/Home';
-import PatioMapping from '../screens/PatioMapping';
-import RealtimeMap from '../screens/RealtimeMap';
-import Developers from '../screens/Developers';
+import Home from "../screens/Home";
+import PatioMapping from "../screens/PatioMapping";
+import RealtimeMap from "../screens/RealtimeMap";
+import Developers from "../screens/Developers";
 // REMOVER: import Profile from '../screens/Profile'; // Não precisa mais do Profile diretamente
 // NOVO: Importar o ProfileStack que gerencia a navegação do Perfil
-import ProfileStack from './ProfileStack'; 
+import ProfileStack from "./ProfileStack";
 
 const Tab = createBottomTabNavigator();
 
@@ -23,28 +23,29 @@ export default function Tabs({ onLogout, toggleTheme }: TabsProps) {
 
   return (
     <Tab.Navigator
+      id={undefined}
       screenOptions={({ route }) => ({
         tabBarIcon: ({ color, size }) => {
           let iconName: any;
 
           switch (route.name) {
-            case 'Home':
-              iconName = 'home';
+            case "Home":
+              iconName = "home";
               break;
-            case 'Pátio':
-              iconName = 'grid';
+            case "Pátio":
+              iconName = "grid";
               break;
-            case 'Mapa':
-              iconName = 'map';
+            case "Mapa":
+              iconName = "map";
               break;
-            case 'Devs':
-              iconName = 'people';
+            case "Devs":
+              iconName = "people";
               break;
-            case 'Perfil':
-              iconName = 'person';
+            case "Perfil":
+              iconName = "person";
               break;
             default:
-              iconName = 'alert-circle';
+              iconName = "alert-circle";
           }
 
           return <Ionicons name={iconName} size={size} color={color} />;
@@ -56,14 +57,14 @@ export default function Tabs({ onLogout, toggleTheme }: TabsProps) {
         tabBarStyle: {
           backgroundColor: theme.colors.surface,
           borderTopColor: theme.colors.outlineVariant,
-        }
+        },
       })}
     >
       <Tab.Screen name="Home" component={Home} />
       <Tab.Screen name="Pátio" component={PatioMapping} />
       <Tab.Screen name="Mapa" component={RealtimeMap} />
       <Tab.Screen name="Devs" component={Developers} />
-      
+
       <Tab.Screen name="Perfil">
         {() => <ProfileStack onLogout={onLogout} toggleTheme={toggleTheme} />}
       </Tab.Screen>
