@@ -7,9 +7,8 @@ import Home from "../screens/Home";
 import PatioMapping from "../screens/PatioMapping";
 import RealtimeMap from "../screens/RealtimeMap";
 import Developers from "../screens/Developers";
-// REMOVER: import Profile from '../screens/Profile'; // Não precisa mais do Profile diretamente
-// NOVO: Importar o ProfileStack que gerencia a navegação do Perfil
 import ProfileStack from "./ProfileStack";
+import FiliaisScreen from "../screens/FiliaisScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -30,27 +29,30 @@ export default function Tabs({ onLogout, toggleTheme }: TabsProps) {
 
           switch (route.name) {
             case "Home":
-              iconName = "home";
+              iconName = "home-outline";
               break;
             case "Pátio":
-              iconName = "grid";
+              iconName = "grid-outline";
+              break;
+            case "Filiais":
+              iconName = "business-outline";
               break;
             case "Mapa":
-              iconName = "map";
+              iconName = "map-outline";
               break;
             case "Devs":
-              iconName = "people";
+              iconName = "people-outline";
               break;
+
             case "Perfil":
-              iconName = "person";
+              iconName = "person-outline";
               break;
             default:
-              iconName = "alert-circle";
+              iconName = "alert-circle-outline";
           }
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        // Configurações de estilo do Tab Navigator (mantidas e corretas)
         headerShown: false,
         tabBarActiveTintColor: theme.colors.primary,
         tabBarInactiveTintColor: theme.colors.onSurfaceVariant,
@@ -62,9 +64,9 @@ export default function Tabs({ onLogout, toggleTheme }: TabsProps) {
     >
       <Tab.Screen name="Home" component={Home} />
       <Tab.Screen name="Pátio" component={PatioMapping} />
+      <Tab.Screen name="Filiais" component={FiliaisScreen} />   
       <Tab.Screen name="Mapa" component={RealtimeMap} />
       <Tab.Screen name="Devs" component={Developers} />
-
       <Tab.Screen name="Perfil">
         {() => <ProfileStack onLogout={onLogout} toggleTheme={toggleTheme} />}
       </Tab.Screen>
