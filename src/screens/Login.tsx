@@ -1,16 +1,8 @@
-import React, { useState } from "react";
-import {
-  View,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-  Image,
-} from "react-native";
-import { loginUser } from "../services/authService";
-import { useNavigation } from "@react-navigation/native";
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useTheme, Text, Button } from 'react-native-paper'; 
+import React, { useState } from 'react';
+import { View, StyleSheet, Image } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { useTheme, Text, Button, TextInput, HelperText } from 'react-native-paper';
+import { loginUser } from '../services/authService';
 
 interface LoginProps {
   onLogin: () => void;
@@ -18,103 +10,153 @@ interface LoginProps {
 
 const LoginScreen: React.FC<LoginProps> = ({ onLogin }) => {
   const theme = useTheme();
-  const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
-  const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
 
-  const handleLogin = async () => {
-    if (!email || !senha) {
-      Alert.alert("Erro", "Preencha todos os campos");
-      return;
-    }
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
+  const [isPasswordSecure, setIsPasswordSecure] = useState(true); // Estado para a visibilidade da senha
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<{ email?: string; senha?: string }>({});
 
+  const validate = () => {
+    const newErrors: { email?: string; senha?: string } = {};
+    if (!email) {
+      newErrors.email = 'O e-mail é obrigatório.';
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = 'Formato de e-mail inválido.';
+    }
+    if (!senha) {
+      newErrors.senha = 'A senha é obrigatória.';
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleFirebaseError = (errorCode: string) => {
+    switch (errorCode) {
+      case 'auth/user-not-found':
+      case 'auth/wrong-password':
+      case 'auth/invalid-credential':
+        return 'E-mail ou senha incorretos.';
+      case 'auth/invalid-email':
+        return 'O formato do e-mail é inválido.';
+      default:
+        return 'Ocorreu um erro ao fazer login. Tente novamente.';
+    }
+  };
+
+  const handleLogin = async () => {
+    if (!validate()) return;
+
+    setLoading(true);
     try {
-      setLoading(true);
       await loginUser(email, senha);
       onLogin();
     } catch (error: any) {
-      Alert.alert("Erro ao logar", error.message);
+      const message = handleFirebaseError(error.code);
+      setErrors({ email: message, senha: ' ' }); // Exibe o erro no campo de e-mail e marca o de senha
     } finally {
       setLoading(false);
     }
   };
 
   const styles = StyleSheet.create({
-    container: { 
-        flex: 1, 
-        justifyContent: "center", 
-        padding: 20,
-        backgroundColor: theme.colors.background,
-    },
-    title: {
-      fontSize: 24,
-      fontWeight: "bold",
-      marginBottom: 20,
-      textAlign: "center",
-      color: theme.colors.onBackground,
+    container: {
+      flex: 1,
+      justifyContent: 'center',
+      padding: 20,
+      backgroundColor: theme.colors.background,
     },
     logo: {
       width: 120,
       height: 120,
-      alignSelf: "center",
+      alignSelf: 'center',
       marginBottom: 20,
     },
+    title: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      marginBottom: 20,
+      textAlign: 'center',
+      color: theme.colors.onBackground,
+    },
     input: {
-      borderWidth: 1,
-      borderColor: theme.colors.outline,
-      padding: 15,
-      marginBottom: 10,
-      borderRadius: 8,
-      backgroundColor: theme.colors.surface,
-      color: theme.colors.onSurface,
+      marginBottom: 5,
     },
     button: {
-      backgroundColor: theme.colors.primary,
-      padding: 15,
-      borderRadius: 8,
-      alignItems: "center",
+      marginTop: 20,
+      paddingVertical: 8,
     },
-    buttonText: { color: theme.colors.onPrimary, fontWeight: "bold" },
-    link: { color: theme.colors.primary, marginTop: 15, textAlign: "center" },
+    linkContainer: {
+      marginTop: 20,
+      alignItems: 'center',
+    },
+    link: {
+      color: theme.colors.primary,
+    },
+    helperText: {
+      marginBottom: 10,
+    }
   });
 
   return (
     <View style={styles.container}>
-      <Image source={require("../../assets/logo-mottu.png")} style={styles.logo} />
+      <Image source={require('../../assets/logo-mottu.png')} style={styles.logo} />
       <Text style={styles.title}>Login</Text>
+
       <TextInput
-        style={styles.input}
-        placeholder="Email"
-        placeholderTextColor={theme.colors.onSurfaceDisabled}
+        label="E-mail"
         value={email}
-        onChangeText={setEmail}
+        onChangeText={(text) => {
+          setEmail(text);
+          if (errors.email) setErrors({});
+        }}
+        style={styles.input}
+        error={!!errors.email}
+        autoCapitalize="none"
+        keyboardType="email-address"
       />
+      <HelperText type="error" visible={!!errors.email} style={styles.helperText}>
+        {errors.email}
+      </HelperText>
 
       <TextInput
-        style={styles.input}
-        placeholder="Senha"
-        placeholderTextColor={theme.colors.onSurfaceDisabled}
-        secureTextEntry
+        label="Senha"
         value={senha}
-        onChangeText={setSenha}
+        onChangeText={(text) => {
+          setSenha(text);
+          if (errors.senha) setErrors({});
+        }}
+        secureTextEntry={isPasswordSecure}
+        style={styles.input}
+        error={!!errors.senha}
+        right={
+          <TextInput.Icon
+            icon={isPasswordSecure ? 'eye' : 'eye-off'}
+            onPress={() => setIsPasswordSecure(!isPasswordSecure)}
+          />
+        }
       />
+      <HelperText type="error" visible={!!errors.senha} style={styles.helperText}>
+        {errors.senha}
+      </HelperText>
 
-      <TouchableOpacity
-        style={styles.button}
+      <Button
+        mode="contained"
         onPress={handleLogin}
+        loading={loading}
         disabled={loading}
+        style={styles.button}
+        labelStyle={{ fontWeight: 'bold' }}
       >
-        <Text style={styles.buttonText}>
-          {loading ? "Carregando..." : "Entrar"}
-        </Text>
-      </TouchableOpacity>
+        {loading ? 'A carregar...' : 'Entrar'}
+      </Button>
 
-      <TouchableOpacity
-        onPress={() => navigation.navigate("Register" as never)}
-      >
-        <Text style={styles.link}>Criar conta</Text>
-      </TouchableOpacity>
+      <View style={styles.linkContainer}>
+        <Text onPress={() => navigation.navigate('Register' as never)}>
+          <Text style={styles.link}>Criar conta</Text>
+        </Text>
+      </View>
     </View>
   );
 };
