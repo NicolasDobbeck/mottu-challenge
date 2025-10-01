@@ -1,4 +1,4 @@
-# 🛵 Challenge Mottu
+# 🛵 Challenge MottuFlux
 
 ❗ATENÇÃO: O PROJETO AINDA ESTA EM DESENVOLVIMENTO
 
@@ -97,4 +97,5 @@ yarn install
 ```bash
 npx expo start
 ```
+
 
