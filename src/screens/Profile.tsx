@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo} from "react";
 import {
   View,
   StyleSheet,
@@ -7,9 +7,11 @@ import {
   ScrollView,
   TouchableOpacity,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { auth } from "../config/firebaseConfig";
 import { logoutUser } from "../services/authService";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import i18n, { t } from "../services/i18n";
 import {
   useTheme,
   Button,
@@ -33,19 +35,49 @@ export default function Profile({ onLogout, toggleTheme }: ProfileProps) {
 
   const user = auth.currentUser;
   const [loading, setLoading] = useState(false);
-  const [idiomaMenuVisible, setIdiomaMenuVisible] = useState(false);
+
+  const [currentLocale, setCurrentLocale] = useState(i18n.locale);
+
+  // Carrega o idioma salvo no AsyncStorage quando o componente montar
+  useFocusEffect(
+    React.useCallback(() => {
+      const syncLocale = async () => {
+        const savedLocale = await AsyncStorage.getItem('user-locale');
+
+        const activeLocale = savedLocale || i18n.locale;
+
+        i18n.locale = activeLocale;
+
+        setCurrentLocale(activeLocale);
+      };
+      
+      syncLocale();
+
+      return () => {}; 
+    }, [])
+  );
+
 
   // Estado do Avatar: Tentativa de usar a foto atual do Firebase ou a remota padrão
   const [avatarSource, setAvatarSource] = useState(
     user?.photoURL || DefaultRemoteAvatar
   );
 
-  // 1.Lista de itens de menu refatorada para navegação
-  const listItems = [
-    { id: 'conta', icon: 'account-cog', title: 'Conta', description: 'Altere seus dados pessoais e senha.' },
-    { id: 'tema', icon: theme.dark ? "white-balance-sunny" : "weather-night", title: 'Tema', description: `Modo atual: ${theme.dark ? 'Escuro' : 'Claro'}` },
-    { id: 'idioma', icon: 'translate', title: 'Idioma', description: 'Português (Brasil)' },
-  ];
+  const listItems = useMemo(() => [
+    { id: 'conta', icon: 'account-cog', title: t('profile.account'), description: t('profile.accountDesc') },
+    { 
+      id: 'tema', 
+      icon: theme.dark ? "white-balance-sunny" : "weather-night", 
+      title: t('profile.theme'), 
+      description: t('profile.themeDesc', { theme: theme.dark ? t('themes.dark') : t('themes.light') })
+    },
+    { 
+      id: 'idioma', 
+      icon: 'translate', 
+      title: t('profile.language'), 
+      description: t(`languages.${currentLocale}` as 'languages.pt' | 'languages.es') 
+    },
+  ], [currentLocale, theme.dark]);
   
   const handleListItemPress = (id: string) => {
     switch (id) {
@@ -56,7 +88,7 @@ export default function Profile({ onLogout, toggleTheme }: ProfileProps) {
         navigation.navigate('AccountSettings' as never); 
         break;
       case 'idioma':
-        setIdiomaMenuVisible(true);
+        navigation.navigate('LanguageSettings' as never);
         break;
       default:
         Alert.alert("Ação:", `Navegar para a tela de ${id}.`);
@@ -129,58 +161,33 @@ export default function Profile({ onLogout, toggleTheme }: ProfileProps) {
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <Text variant="headlineMedium" style={{ color: theme.colors.onSurface }}>
-            Perfil
+            {t('profile.title')}
         </Text>
         
         <View style={styles.avatarContainer}>
           <Image source={finalImageSource} style={styles.avatar} />
         </View>
 
-        <Text variant="titleLarge" style={styles.nameText}>{user?.displayName || "Usuário Mottu"}</Text>
-        <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceDisabled }}>{user?.email || "email@mottu.com"}</Text>
+        <Text variant="titleLarge" style={styles.nameText}>{user?.displayName || t('profile.user')}</Text>
+        <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceDisabled }}>{user?.email ||t('profile.email')}</Text>
       </View>
       
       {/* Lista de Itens (Cards) */}
       <View style={styles.listSection}>
-        <List.Section title="Configurações" titleStyle={{ color: theme.colors.onSurface }}>
-            {listItems.map((item, index) => (
-                item.id === 'idioma' ? (
-                    <Menu
-                        key={item.id}
-                        visible={idiomaMenuVisible}
-                        onDismiss={() => setIdiomaMenuVisible(false)}
-                        anchor={
-                            <Surface style={styles.listItemCard} elevation={2}>
-                                <List.Item
-                                    title={item.title}
-                                    description={item.description}
-                                    descriptionStyle={{ color: theme.colors.onSurfaceDisabled }}
-                                    left={props => <List.Icon {...props} icon={item.icon} color={theme.colors.primary} />}
-                                    onPress={() => handleListItemPress(item.id)}
-                                    style={styles.listItem}
-                                />
-                            </Surface>
-                        }
-                    >
-                        {/* Itens do Dropdown de Idioma */}
-                        <Menu.Item onPress={() => { Alert.alert("Idioma", "Português selecionado"); setIdiomaMenuVisible(false); }} title="Português (BR)" />
-                        <Menu.Item onPress={() => { Alert.alert("Idioma", "Espanhol selecionado"); setIdiomaMenuVisible(false); }} title="Español" />
-                        <Menu.Item onPress={() => { Alert.alert("Idioma", "Inglês selecionado"); setIdiomaMenuVisible(false); }} title="English" />
-                    </Menu>
-                ) : (
-                    <Surface key={item.id} style={styles.listItemCard} elevation={2}>
-                        <List.Item
-                            title={item.title}
-                            description={item.description}
-                            descriptionStyle={{ color: theme.colors.onSurfaceDisabled }}
-                            left={props => <List.Icon {...props} icon={item.icon} color={theme.colors.primary} />}
-                            onPress={() => handleListItemPress(item.id)}
-                            style={styles.listItem}
-                            right={props => <List.Icon {...props} icon="chevron-right" />}
-                        />
-                    </Surface>
-                )
-            ))}
+        <List.Section title={t('profile.settings')} titleStyle={{ color: theme.colors.onSurface }}>
+          {listItems.map((item) => (
+            <Surface key={item.id} style={styles.listItemCard} elevation={2}>
+              <List.Item
+                title={item.title}
+                description={item.description}
+                descriptionStyle={{ color: theme.colors.onSurfaceDisabled }}
+                left={props => <List.Icon {...props} icon={item.icon} color={theme.colors.primary} />}
+                onPress={() => handleListItemPress(item.id)}
+                style={styles.listItem}
+                right={props => <List.Icon {...props} icon="chevron-right" />}
+              />
+            </Surface>
+          ))}
         </List.Section>
       </View>
 
@@ -194,7 +201,7 @@ export default function Profile({ onLogout, toggleTheme }: ProfileProps) {
           style={{ marginBottom: 10, borderRadius: 20 }}
           disabled={loading}
         >
-          Logout
+          {t('profile.logout')}
         </Button>
       </View>
     </ScrollView>

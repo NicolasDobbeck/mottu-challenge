@@ -1,0 +1,128 @@
+{
+  "es": {
+    "profile": {
+      "title": "Perfil",
+      "settings": "Configuración",
+      "account": "Cuenta",
+      "accountDesc": "Cambie sus datos personales y contraseña.",
+      "theme": "Tema",
+      "themeDesc": "Modo actual: %{theme}",
+      "language": "Idioma",
+      "languageDesc": "Español",
+      "logout": "Cerrar Sesión",
+      "user": "Usuario Mottu",
+      "email": "email@mottu.com"
+    },
+    "accountSettings": {
+      "title": "Configuración de la Cuenta",
+      "changePhoto": "Cambiar Foto",
+      "nameLabel": "Nombre Social / Apodo",
+      "passwordLabel": "Nueva Contraseña (Mínimo 6 caracteres)",
+      "save": "Guardar Cambios",
+      "success": "Éxito",
+      "successMsg": "¡Su información ha sido actualizada!",
+      "noChanges": "Atención",
+      "noChangesMsg": "No se detectaron cambios.",
+      "info": "Información Personal",
+      "password": "Actualizar Contraseña",
+      "errorAuth": "Ningún usuario autenticado. Inicie sesión de nuevo.",
+      "errorSave": "Error al Guardar",
+      "errorSaveMsg": "No se pudo actualizar. Intente iniciar sesión de nuevo.",
+      "warnPassword": "La contraseña debe tener al menos 6 caracteres.",
+      "warnImageUpload": "La función de carga de imágenes a Firebase Storage aún no está implementada. La imagen local se guardará al cargar la pantalla, pero no persistirá en la base de datos.",
+      "warnPermission": "Permiso denegado",
+      "warnPermissionMsg": "Es necesario permitir el acceso a la galería."
+    },
+    "languages": {
+      "pt": "Português (BR)",
+      "es": "Español"
+    },
+    "themes": {
+      "light": "Claro",
+      "dark": "Oscuro"
+    },
+    "home": {
+      "welcome": "¡Bienvenido a la App de Pátio de Mottu!\nCon ella, usted garantiza el registro, rastreo y monitoreo de las motos de Mottu de forma rápida y segura.",
+      "button": "Ver patio digital"
+    },
+    "auth": {
+      "loginTitle": "Login",
+      "registerTitle": "Crear Cuenta",
+      "emailLabel": "E-mail",
+      "passwordLabel": "Contraseña",
+      "nameLabel": "Nombre Social",
+      "loginButton": "Entrar",
+      "registerButton": "Registrar",
+      "loading": "Cargando...",
+      "registering": "Registrando...",
+      "goToRegister": "Crear cuenta",
+      "goToLogin": "¿Ya tiene cuenta? Inicie sesión",
+      "errors": {
+        "nameRequired": "El nombre social es obligatorio.",
+        "emailRequired": "El e-mail es obligatorio.",
+        "emailInvalid": "Formato de e-mail inválido.",
+        "passwordRequired": "La contraseña es obligatoria.",
+        "passwordLength": "La contraseña debe tener al menos 6 caracteres.",
+        "credentialsInvalid": "E-mail o contraseña incorrectos.",
+        "emailInUse": "Este e-mail ya está en uso.",
+        "passwordWeak": "La contraseña es muy débil. Pruebe una más fuerte.",
+        "loginError": "Ocurrió un error al iniciar sesión. Inténtelo de nuevo.",
+        "registerError": "Ocurrió un error al crear la cuenta."
+      },
+      "registerSuccessTitle": "Éxito",
+      "registerSuccessMsg": "¡Cuenta creada con éxito! Inicie sesión para continuar."
+    },
+    "filiais": {
+      "title": "Gestión de Filiales",
+      "loading": "Cargando filiales...",
+      "error": "Error al cargar los datos.",
+      "retry": "Intentar de Nuevo",
+      "empty": "No se encontró ninguna filial.",
+      "subtitle": "CNPJ: %{cnpj} | País: %{pais}",
+      "deleteTitle": "Confirmar Eliminación",
+      "deleteMsg": "¿Está seguro de que desea eliminar la filial \"%{nome}\"? Esta acción no se puede deshacer.",
+      "cancel": "Cancelar",
+      "delete": "Eliminar",
+      "successDeleteTitle": "Éxito",
+      "successDeleteMsg": "Filial eliminada con éxito.",
+      "errorCreate": "crear",
+      "errorUpdate": "actualizar",
+      "errorDelete": "eliminar",
+      "errorAlertTitle": "Error",
+      "errorAlertMsg": "No se pudo %{action} la filial. Inténtelo de nuevo.",
+      "form": {
+        "titleCreate": "Nueva Filial",
+        "titleUpdate": "Editar Filial",
+        "name": "Nombre de la Filial",
+        "nameRequired": "El nombre de la filial es obligatorio.",
+        "cnpj": "CNPJ",
+        "cnpjRequired": "El CNPJ es obligatorio.",
+        "cnpjLong": "El CNPJ es demasiado largo.",
+        "select": "Seleccione...",
+        "validationError": "Por favor, corrija los errores en el formulario.",
+        "saving": "Guardando...",
+        "update": "Actualizar",
+        "create": "Crear"
+      }
+    },
+    "patio": {
+      "title": "Mapeo del Patio",
+      "loading": "Cargando Patio...",
+      "errorConnection": "Error de Conexión",
+      "errorConnectionMsg": "No se pudieron cargar los datos del patio. Verifique su conexión e intente nuevamente.",
+      "errorNetwork": "Error de Red",
+      "errorNetworkMsg": "No se pudo actualizar el estado de la moto.",
+      "sector": "Sector %{setor}",
+      "modalTitle": "Detalles de la Moto",
+      "modalPlaca": "Matrícula: %{placa}",
+      "modalStatus": "Estado Actual: %{status}",
+      "modalSetor": "Sector: %{setor}",
+      "modalChangeStatus": "Cambiar estado para:",
+      "modalClose": "Cerrar"
+    },
+    "common": {
+      "error": "Error",
+      "attention": "Atención"
+    }
+  }
+}

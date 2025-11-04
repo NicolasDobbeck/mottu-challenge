@@ -8,6 +8,7 @@ import { ActivityIndicator, View } from "react-native";
 
 import { auth } from "./src/config/firebaseConfig";
 import { queryClient } from "./react-query";
+import './src/services/i18n';
 import Tabs from "./src/navigation/Tabs";
 import AuthStack from "./src/navigation/AuthStack";
 

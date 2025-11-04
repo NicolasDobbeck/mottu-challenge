@@ -12,6 +12,7 @@ import {
 import { useTheme, Text } from 'react-native-paper'; 
 // Importando o nosso novo serviço e a interface Moto
 import { Moto, getMotos, updateMoto } from "../services/motoService";
+import { t } from '../services/i18n';
 
 // Constantes permanecem as mesmas
 const STATUS_COLORS: Record<string, string> = {
@@ -37,7 +38,7 @@ export default function PatioMapping() {
       const motosDoBackend = await getMotos();
       setMotos(motosDoBackend);
     } catch (error) {
-      Alert.alert("Erro de Conexão", "Não foi possível carregar os dados do pátio. Verifique a sua conexão e tente novamente.");
+      Alert.alert(t('patio.errorConnection'), t('patio.errorConnectionMsg'));
     }
   };
 
@@ -71,7 +72,7 @@ export default function PatioMapping() {
       await updateMoto(selectedMoto.idMoto, motoParaAtualizar);
     } catch (error) {
       // 3. Reversão: Se a API falhar, mostra um erro e volta a UI para o estado original
-      Alert.alert("Erro de Rede", "Não foi possível atualizar o status da moto.");
+      Alert.alert(t('patio.errorNetwork'), t('patio.errorNetworkMsg'));
       setMotos(originalMotos);
     }
   };
@@ -101,7 +102,7 @@ export default function PatioMapping() {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={theme.colors.primary} />
-        <Text style={{ marginTop: 10, color: theme.colors.onBackground }}>A carregar Pátio...</Text>
+        <Text style={{ marginTop: 10, color: theme.colors.onBackground }}>{t('patio.loading')}</Text>
       </View>
     );
   }
@@ -112,11 +113,11 @@ export default function PatioMapping() {
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[theme.colors.primary]}/>
     }>
-      <Text style={styles.title}>Mapeamento do Pátio</Text>
+      <Text style={styles.title}>{t('patio.title')}</Text>
 
       {setores.map((setor) => (
         <View key={setor} style={styles.sector}>
-          <Text style={styles.sectorTitle}>Setor {setor}</Text>
+          <Text style={styles.sectorTitle}>{t('patio.sector', { setor: setor })}</Text>
           <View style={styles.patio}>
             {motos
               .filter((m) => m.setor === setor)
@@ -140,15 +141,15 @@ export default function PatioMapping() {
         <Modal transparent animationType="fade" visible={true}>
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Detalhes da Moto</Text>
-              <Text style={styles.modalText}>Placa: {selectedMoto.placa}</Text>
+              <Text style={styles.modalTitle}>{t('patio.modalTitle')}</Text>
+              <Text style={styles.modalText}>{t('patio.modalPlaca', { placa: selectedMoto.placa })}</Text>
               <Text style={styles.modalText}>
-                Status Atual: {selectedMoto.status}
+                {t('patio.modalStatus', { status: selectedMoto.status })}
               </Text>
-              <Text style={styles.modalText}>Setor: {selectedMoto.setor}</Text>
+              <Text style={styles.modalText}>{t('patio.modalSetor', { setor: selectedMoto.setor })}</Text>
 
               <Text style={[styles.modalText, { marginTop: 15, fontWeight: 'bold' }]}>
-                Alterar status para:
+                {t('patio.modalChangeStatus')}
               </Text>
               <View style={styles.statusButtonsContainer}>
                 {statusOptions.map((status) => (
@@ -169,7 +170,7 @@ export default function PatioMapping() {
                 style={styles.cancelButton}
                 onPress={() => setSelectedMoto(null)}
               >
-                <Text style={styles.cancelButtonText}>Fechar</Text>
+                <Text style={styles.cancelButtonText}>{t('patio.modalClose')}</Text>
               </TouchableOpacity>
             </View>
           </View>

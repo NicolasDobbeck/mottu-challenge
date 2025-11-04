@@ -4,6 +4,7 @@ import { Appbar, Card, Text, FAB, useTheme, ActivityIndicator, IconButton, Porta
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getFiliais, createFilial, updateFilial, deleteFilial, Filial, FilialFormData } from '../services/filialService';
 import FilialFormModal from '../components/FilialFormModal';
+import { t } from '../services/i18n';
 
 const FiliaisScreen: React.FC = () => {
   const theme = useTheme();
@@ -27,8 +28,8 @@ const FiliaisScreen: React.FC = () => {
   };
 
   const handleMutationError = (error: Error, action: string) => {
-    console.error(`Erro ao ${action} filial:`, error);
-    Alert.alert(`Erro`, `Não foi possível ${action} a filial. Tente novamente.`);
+    const actionT = t(`filiais.error${action.charAt(0).toUpperCase() + action.slice(1)}` as 'filiais.errorCreate');
+    Alert.alert(t('filiais.errorAlertTitle'), t('filiais.errorAlertMsg', { action: actionT }));
   };
 
   // Mutações
@@ -50,7 +51,7 @@ const FiliaisScreen: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['filiais'] });
       setDeleteDialogVisible(false);
       setFilialToDelete(null);
-      Alert.alert('Sucesso', 'Filial excluída com sucesso.');
+      Alert.alert(t('filiais.successDeleteTitle'), t('filiais.successDeleteMsg'));
     },
     onError: (err) => {
       handleMutationError(err, 'excluir');
@@ -91,7 +92,7 @@ const FiliaisScreen: React.FC = () => {
     return (
       <View style={[styles.center, { backgroundColor: theme.colors.background }]}>
         <ActivityIndicator animating={true} color={theme.colors.primary} size="large" />
-        <Text style={{ marginTop: 10 }}>A carregar filiais...</Text>
+        <Text style={{ marginTop: 10 }}>{t('filiais.loading')}</Text>
       </View>
     );
   }
@@ -99,8 +100,8 @@ const FiliaisScreen: React.FC = () => {
   if (error) {
     return (
       <View style={[styles.center, { backgroundColor: theme.colors.background }]}>
-        <Text style={{ color: theme.colors.error }}>Erro ao carregar os dados.</Text>
-        <Button onPress={() => refetch()}>Tentar Novamente</Button>
+        <Text style={{ color: theme.colors.error }}>{t('filiais.error')}</Text>
+        <Button onPress={() => refetch()}>{t('filiais.retry')}</Button>
       </View>
     );
   }
@@ -108,7 +109,7 @@ const FiliaisScreen: React.FC = () => {
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <Appbar.Header style={{ backgroundColor: theme.colors.primary }}>
-        <Appbar.Content title="Gestão de Filiais" color={theme.colors.onPrimary} />
+        <Appbar.Content title={t('filiais.title')} color={theme.colors.onPrimary} />
       </Appbar.Header>
 
       <FlatList
@@ -119,7 +120,7 @@ const FiliaisScreen: React.FC = () => {
           <Card style={styles.card}>
             <Card.Title
               title={item.nome}
-              subtitle={`CNPJ: ${item.cnpj} | País: ${item.cdPais}`}
+              subtitle={t('filiais.subtitle', { cnpj: item.cnpj, pais: item.cdPais })}
               titleStyle={{ color: theme.colors.onSurface }}
               subtitleStyle={{ color: theme.colors.onSurfaceVariant }}
             />
@@ -131,7 +132,7 @@ const FiliaisScreen: React.FC = () => {
         )}
         ListEmptyComponent={() => (
           <View style={styles.center}>
-            <Text>Nenhuma filial encontrada.</Text>
+            <Text>{t('filiais.empty')}</Text>
           </View>
         )}
       />
@@ -153,13 +154,13 @@ const FiliaisScreen: React.FC = () => {
 
       <Portal>
         <Dialog visible={deleteDialogVisible} onDismiss={() => setDeleteDialogVisible(false)}>
-          <Dialog.Title>Confirmar Exclusão</Dialog.Title>
+          <Dialog.Title>{t('filiais.deleteTitle')}</Dialog.Title>
           <Dialog.Content>
-            <Text>Tem a certeza de que deseja excluir a filial "{filialToDelete?.nome}"? Esta ação não pode ser desfeita.</Text>
+            <Text>{t('filiais.deleteMsg', { nome: filialToDelete?.nome })}</Text>
           </Dialog.Content>
           <Dialog.Actions>
-            <Button onPress={() => setDeleteDialogVisible(false)}>Cancelar</Button>
-            <Button onPress={confirmDelete} loading={deleteMutation.isPending} disabled={deleteMutation.isPending}>Excluir</Button>
+            <Button onPress={() => setDeleteDialogVisible(false)}>{t('filiais.cancel')}</Button>
+            <Button onPress={confirmDelete} loading={deleteMutation.isPending} disabled={deleteMutation.isPending}>{t('filiais.delete')}</Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>

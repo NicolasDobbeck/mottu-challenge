@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Modal, ScrollView, Alert } from 'react-native';
 import { Appbar, TextInput, Button, useTheme, Text, Menu } from 'react-native-paper';
 import { FilialFormData, Filial } from '../services/filialService'; // Importa a interface Filial correta
+import { t } from '../services/i18n';
 
 // Opções para o dropdown de Código do País
 const paisOptions = [
@@ -42,11 +43,11 @@ const FilialFormModal: React.FC<Props> = ({ visible, onClose, onSubmit, filial, 
 
   const validate = (): boolean => {
     const newErrors: { [key: string]: string } = {};
-    if (!nome.trim()) newErrors.nome = 'O nome da filial é obrigatório.';
+    if (!nome.trim()) newErrors.nome = t('filiais.form.nameRequired');
     if (!cnpj.trim()) {
-      newErrors.cnpj = 'O CNPJ é obrigatório.';
+      newErrors.cnpj = t('filiais.form.cnpjRequired');
     } else if (cnpj.length > 18) { // Ajuste para o formato com máscara (ex: 00.000.000/0000-00)
-      newErrors.cnpj = 'O CNPJ é muito longo.';
+      newErrors.cnpj = t('filiais.form.cnpjLong');
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -56,21 +57,21 @@ const FilialFormModal: React.FC<Props> = ({ visible, onClose, onSubmit, filial, 
     if (validate()) {
       onSubmit({ nome, cnpj, cdPais }, filial?.idFilial);
     } else {
-      Alert.alert('Erro de Validação', 'Por favor, corrija os erros no formulário.');
+      Alert.alert(t('common.error'), t('filiais.form.validationError'));
     }
   };
 
-  const selectedLabel = paisOptions.find(p => p.value === cdPais)?.label || 'Selecione...';
+  const selectedLabel = paisOptions.find(p => p.value === cdPais)?.label || t('filiais.form.select');
 
   return (
     <Modal visible={visible} onRequestClose={onClose} animationType="slide">
       <Appbar.Header style={{ backgroundColor: theme.colors.primary }}>
         <Appbar.Action icon="close" onPress={onClose} color={theme.colors.onPrimary} />
-        <Appbar.Content title={filial ? 'Editar Filial' : 'Nova Filial'} color={theme.colors.onPrimary} />
+        <Appbar.Content title={filial ? t('filiais.form.titleUpdate') : t('filiais.form.titleCreate')} color={theme.colors.onPrimary} />
       </Appbar.Header>
       <ScrollView contentContainerStyle={{ padding: 20, backgroundColor: theme.colors.background, flexGrow: 1 }}>
         <TextInput
-          label="Nome da Filial"
+          label={t('filiais.form.name')}
           value={nome}
           onChangeText={setNome}
           mode="outlined"
@@ -80,7 +81,7 @@ const FilialFormModal: React.FC<Props> = ({ visible, onClose, onSubmit, filial, 
         {errors.nome && <Text style={{ color: theme.colors.error, marginBottom: 10 }}>{errors.nome}</Text>}
 
         <TextInput
-          label="CNPJ"
+          label={t('filiais.form.cnpj')}
           value={cnpj}
           onChangeText={setCnpj}
           mode="outlined"
@@ -127,7 +128,7 @@ const FilialFormModal: React.FC<Props> = ({ visible, onClose, onSubmit, filial, 
           style={{ paddingVertical: 8, backgroundColor: theme.colors.primary }}
           labelStyle={{ color: theme.colors.onPrimary }}
         >
-          {isLoading ? 'A Guardar...' : (filial ? 'Atualizar' : 'Criar')}
+          {isLoading ? t('filiais.form.saving') : (filial ? t('filiais.form.update') : t('filiais.form.create'))}
         </Button>
       </ScrollView>
     </Modal>

@@ -3,6 +3,7 @@ import { View, StyleSheet, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme, Text, Button, TextInput, HelperText } from 'react-native-paper';
 import { loginUser } from '../services/authService';
+import { t } from '../services/i18n';
 
 interface LoginProps {
   onLogin: () => void;
@@ -21,12 +22,12 @@ const LoginScreen: React.FC<LoginProps> = ({ onLogin }) => {
   const validate = () => {
     const newErrors: { email?: string; senha?: string } = {};
     if (!email) {
-      newErrors.email = 'O e-mail é obrigatório.';
+      newErrors.email = t('auth.errors.emailRequired');
     } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'Formato de e-mail inválido.';
+      newErrors.email = t('auth.errors.emailInvalid');
     }
     if (!senha) {
-      newErrors.senha = 'A senha é obrigatória.';
+      newErrors.senha = t('auth.errors.passwordRequired');
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -37,11 +38,11 @@ const LoginScreen: React.FC<LoginProps> = ({ onLogin }) => {
       case 'auth/user-not-found':
       case 'auth/wrong-password':
       case 'auth/invalid-credential':
-        return 'E-mail ou senha incorretos.';
+        return t('auth.errors.credentialsInvalid');
       case 'auth/invalid-email':
-        return 'O formato do e-mail é inválido.';
+        return t('auth.errors.emailInvalid');
       default:
-        return 'Ocorreu um erro ao fazer login. Tente novamente.';
+        return t('auth.errors.loginError');
     }
   };
 
@@ -102,10 +103,10 @@ const LoginScreen: React.FC<LoginProps> = ({ onLogin }) => {
   return (
     <View style={styles.container}>
       <Image source={require('../../assets/logo-mottu.png')} style={styles.logo} />
-      <Text style={styles.title}>Login</Text>
+      <Text style={styles.title}>{t('auth.loginTitle')}</Text>
 
       <TextInput
-        label="E-mail"
+        label={t('auth.emailLabel')}
         value={email}
         onChangeText={(text) => {
           setEmail(text);
@@ -121,7 +122,7 @@ const LoginScreen: React.FC<LoginProps> = ({ onLogin }) => {
       </HelperText>
 
       <TextInput
-        label="Senha"
+        label={t('auth.passwordLabel')}
         value={senha}
         onChangeText={(text) => {
           setSenha(text);
@@ -149,12 +150,12 @@ const LoginScreen: React.FC<LoginProps> = ({ onLogin }) => {
         style={styles.button}
         labelStyle={{ fontWeight: 'bold' }}
       >
-        {loading ? 'A carregar...' : 'Entrar'}
+        {loading ? t('auth.loading') : t('auth.loginButton')}
       </Button>
 
       <View style={styles.linkContainer}>
         <Text onPress={() => navigation.navigate('Register' as never)}>
-          <Text style={styles.link}>Criar conta</Text>
+          <Text style={styles.link}>{t('auth.goToRegister')}</Text>
         </Text>
       </View>
     </View>

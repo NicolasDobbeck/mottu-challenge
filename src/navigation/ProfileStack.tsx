@@ -2,7 +2,9 @@ import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import Profile from "../screens/Profile";
 import AccountSettings from "../screens/AccountSettings";
+import LanguageSettings from "../screens/LanguageSettings";
 import { useTheme } from "react-native-paper";
+import { t } from "../services/i18n";
 
 const Stack = createStackNavigator();
 
@@ -39,9 +41,19 @@ export default function ProfileStack({
         component={AccountSettings}
         options={{
           headerShown: true,
-          title: "Configurações da Conta",
+          title: t('accountSettings.title'),
         }}
       />
+
+      <Stack.Screen
+        name="LanguageSettings"
+        component={LanguageSettings}
+        options={{
+          headerShown: true,
+          title: t('profile.language'), // Reutiliza a tradução "Idioma"
+        }}
+      />
+      
     </Stack.Navigator>
   );
 }

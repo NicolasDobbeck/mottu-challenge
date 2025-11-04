@@ -1,12 +1,29 @@
-import React from "react";
+import React, { useState, useCallback } from "react";
 import { View, StyleSheet, Image, TouchableOpacity } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme, Text } from "react-native-paper";
+import i18n, { t } from '../services/i18n';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Home() {
   const navigation = useNavigation();
   const theme = useTheme();
+  const [locale, setLocale] = useState(i18n.locale)
+
+useFocusEffect(
+  useCallback(() => {
+    const syncLocale = async () => {
+      const savedLocale = await AsyncStorage.getItem('user-locale');
+      const activeLocale = savedLocale || i18n.locale;
+
+      i18n.locale = activeLocale;
+      setLocale(activeLocale); // Atualiza o estado local para forçar a re-renderização
+    };
+
+    syncLocale();
+  }, [])
+);
 
   const styles = StyleSheet.create({
     container: {
@@ -62,9 +79,7 @@ export default function Home() {
         <Text style={styles.title}>MottuFlux</Text>
 
         <Text style={styles.subtitle}>
-          Bem-vindo ao App de Pátio da Mottu!{"\n"}
-          Com ele, você garante o registro, rastreio e monitoramento das motos
-          da Mottu de forma rápida e segura.
+          {t('home.welcome')}
         </Text>
       </View>
 
@@ -72,7 +87,7 @@ export default function Home() {
         style={styles.button}
         onPress={() => navigation.navigate("Pátio" as never)}
       >
-        <Text style={styles.buttonText}>Visualizar pátio digital</Text>
+        <Text style={styles.buttonText}>{t('home.button')}</Text>
       </TouchableOpacity>
 
       <View style={styles.imageContainer}>

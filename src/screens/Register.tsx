@@ -3,6 +3,7 @@ import { View, StyleSheet, Image, Alert } from 'react-native';
 import { useNavigation, CommonActions } from '@react-navigation/native';
 import { useTheme, Text, Button, TextInput, HelperText } from 'react-native-paper';
 import { registerUser } from '../services/authService';
+import { t } from '../services/i18n';
 
 export default function RegisterScreen() {
   const theme = useTheme();
@@ -18,17 +19,17 @@ export default function RegisterScreen() {
   const validate = () => {
     const newErrors: { nomeSocial?: string; email?: string; senha?: string } = {};
     if (!nomeSocial) {
-      newErrors.nomeSocial = 'O nome social é obrigatório.';
+      newErrors.nomeSocial = t('auth.errors.nameRequired');
     }
     if (!email) {
-      newErrors.email = 'O e-mail é obrigatório.';
+      newErrors.email = t('auth.errors.emailRequired');
     } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'Formato de e-mail inválido.';
+      newErrors.email = t('auth.errors.emailInvalid');
     }
     if (!senha) {
-      newErrors.senha = 'A senha é obrigatória.';
+      newErrors.senha = t('auth.errors.passwordRequired');
     } else if (senha.length < 6) {
-      newErrors.senha = 'A senha deve ter no mínimo 6 caracteres.';
+      newErrors.senha = t('auth.errors.passwordLength');
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -37,13 +38,13 @@ export default function RegisterScreen() {
   const handleFirebaseError = (errorCode: string) => {
     switch (errorCode) {
       case 'auth/email-already-in-use':
-        return 'Este e-mail já está a ser utilizado.';
+        return t('auth.errors.emailInUse');
       case 'auth/invalid-email':
-        return 'O formato do e-mail é inválido.';
+        return t('auth.errors.emailInvalid');
       case 'auth/weak-password':
-        return 'A senha é muito fraca. Tente uma mais forte.';
+        return t('auth.errors.passwordWeak')
       default:
-        return 'Ocorreu um erro ao criar a conta.';
+        return t('auth.errors.registerError');
     }
   };
 
@@ -53,7 +54,7 @@ export default function RegisterScreen() {
     setLoading(true);
     try {
       await registerUser(email, senha, nomeSocial);
-      Alert.alert('Sucesso', 'Conta criada com sucesso! Faça login para continuar.');
+      Alert.alert(t('auth.registerSuccessTitle'), t('auth.registerSuccessMsg'));
       navigation.dispatch(
         CommonActions.reset({
           index: 0,
@@ -110,10 +111,10 @@ export default function RegisterScreen() {
   return (
     <View style={styles.container}>
       <Image source={require('../../assets/logo-mottu.png')} style={styles.logo} />
-      <Text style={styles.title}>Criar Conta</Text>
+      <Text style={styles.title}>{t('auth.registerTitle')}</Text>
 
       <TextInput
-        label="Nome Social"
+        label={t('auth.nameLabel')}
         value={nomeSocial}
         onChangeText={(text) => {
           setNomeSocial(text);
@@ -127,7 +128,7 @@ export default function RegisterScreen() {
       </HelperText>
 
       <TextInput
-        label="E-mail"
+        label={t('auth.emailLabel')}
         value={email}
         onChangeText={(text) => {
           setEmail(text);
@@ -143,7 +144,7 @@ export default function RegisterScreen() {
       </HelperText>
 
       <TextInput
-        label="Senha"
+        label={t('auth.passwordLabel')}
         value={senha}
         onChangeText={(text) => {
           setSenha(text);
@@ -171,12 +172,12 @@ export default function RegisterScreen() {
         style={styles.button}
         labelStyle={{ fontWeight: 'bold' }}
       >
-        {loading ? 'A registar...' : 'Registar'}
+        {loading ? t('auth.registering') : t('auth.registerButton')}
       </Button>
 
       <View style={styles.linkContainer}>
         <Text onPress={() => navigation.navigate('Login' as never)}>
-          <Text style={styles.link}>Já tem conta? Faça login</Text>
+          <Text style={styles.link}>{t('auth.goToLogin')}</Text>
         </Text>
       </View>
     </View>

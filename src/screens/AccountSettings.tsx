@@ -13,6 +13,7 @@ import { auth } from "../config/firebaseConfig";
 import { changeUserPassword, updateUserProfile } from "../services/authService"; 
 import { useTheme, Button, Text, TextInput } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
+import { t } from '../services/i18n';
 
 const LocalDefaultAvatar = require('../../assets/generic-avatar.png'); 
 const DefaultRemoteAvatar = "https://cdn-icons-png.flaticon.com/512/20/20162.png";
@@ -33,7 +34,7 @@ export default function AccountSettings() {
 
   const handleUpdateProfile = async () => {
     if (!user) {
-      Alert.alert("Erro", "Nenhum usuário autenticado. Faça login novamente.");
+      Alert.alert(t('common.error'), t('accountSettings.errorAuth'));
       return;
     }
 
@@ -49,7 +50,7 @@ export default function AccountSettings() {
       // 2. Atualizar Senha
       if (senha.trim().length > 0) {
         if (senha.trim().length < 6) {
-             Alert.alert("Atenção", "A senha deve ter pelo menos 6 caracteres.");
+             Alert.alert(t('common.attention'), t('accountSettings.warnPassword'));
              return; // Sai da função para não salvar
         }
         await changeUserPassword(user, senha.trim());
@@ -60,22 +61,22 @@ export default function AccountSettings() {
       const isNewPhoto = typeof avatarSource === 'string' && avatarSource !== (user.photoURL || DefaultRemoteAvatar);
       
       if (isNewPhoto && avatarSource !== DefaultRemoteAvatar) {
-         Alert.alert("Atenção", "A função de upload de imagem para o Firebase Storage ainda não foi implementada. A imagem local será salva ao carregar a tela, mas não persistirá no banco de dados.");
+         Alert.alert(t('common.attention'), t('accountSettings.warnImageUpload'));
          await updateUserProfile(user, { photoURL: avatarSource });
          changesMade = true;
       }
 
 
       if (changesMade) {
-        Alert.alert("Sucesso", "Suas informações foram atualizadas!");
+        Alert.alert(t('accountSettings.success'), t('accountSettings.successMsg'));
         navigation.goBack(); 
       } else {
-        Alert.alert("Atenção", "Nenhuma alteração detectada.");
+        Alert.alert(t('accountSettings.noChanges'), t('accountSettings.noChangesMsg'));
       }
       
     } catch (error: any) {
       console.error(error);
-      Alert.alert("Erro ao Salvar", error.message || "Não foi possível atualizar. Tente fazer login novamente.");
+      Alert.alert(t('accountSettings.errorSave'), error.message || t('accountSettings.errorSaveMsg'));
     } finally {
       setLoading(false);
     }
@@ -84,7 +85,7 @@ export default function AccountSettings() {
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
-      Alert.alert("Permissão negada", "É necessário permitir o acesso à galeria.");
+      Alert.alert(t('accountSettings.warnPermission'), t('accountSettings.warnPermissionMsg'));
       return;
     }
 
@@ -154,11 +155,11 @@ export default function AccountSettings() {
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <Text variant="headlineMedium" style={styles.title}>
-            Configurações da Conta
+            {t('accountSettings.title')}
         </Text>
         <TouchableOpacity onPress={pickImage} style={styles.avatarContainer} disabled={loading}>
           <Image source={finalImageSource} style={styles.avatar} />
-          <Text variant="bodyMedium" style={styles.editText}>Trocar Foto</Text>
+          <Text variant="bodyMedium" style={styles.editText}>{t('accountSettings.changePhoto')}</Text>
         </TouchableOpacity>
 
         <Text variant="titleLarge" style={styles.title}>{user?.displayName || "Nome Social"}</Text>
@@ -168,10 +169,10 @@ export default function AccountSettings() {
 
       <View style={styles.section}>
         <Text variant="titleMedium" style={styles.title}>
-            Informações Pessoais
+            {t('accountSettings.info')}
         </Text>
         <TextInput
-          label="Nome Social / Nickname"
+          label={t('accountSettings.nameLabel')}
           mode="outlined"
           style={styles.input}
           value={nomeSocial}
@@ -180,10 +181,10 @@ export default function AccountSettings() {
         />
 
         <Text variant="titleMedium" style={styles.title}>
-            Atualizar Senha
+            {t('accountSettings.password')}
         </Text>
         <TextInput
-          label="Nova Senha (Mínimo 6 caracteres)"
+          label={t('accountSettings.passwordLabel')}
           mode="outlined"
           secureTextEntry
           style={styles.input}
@@ -199,7 +200,7 @@ export default function AccountSettings() {
           loading={loading}
           style={styles.saveButton}
         >
-          Salvar Alterações
+          {t('accountSettings.save')}
         </Button>
       </View>
     </ScrollView>
