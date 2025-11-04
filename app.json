@@ -20,13 +20,20 @@
         "foregroundImage": "./assets/logo-mottu.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.dobbeckm.mottuchallenge"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
       "expo-secure-store"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "5cbb7ed7-45fd-4b6f-a4cc-25c43b7ae07d"
+      }
+    },
+    "owner": "dobbeckm"
   }
 }

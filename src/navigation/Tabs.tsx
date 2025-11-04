@@ -1,3 +1,6 @@
+// src/navigation/Tabs.tsx
+
+// ==== ✨ 'useEffect' E OS IMPORTS DE NOTIFICAÇÃO FORAM REMOVIDOS ✨ ====
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
@@ -10,6 +13,8 @@ import Developers from "../screens/Developers";
 import ProfileStack from "./ProfileStack";
 import FiliaisScreen from "../screens/FiliaisScreen";
 
+// Não há mais imports de 'notificationService' ou 'authService' aqui
+
 const Tab = createBottomTabNavigator();
 
 type TabsProps = {
@@ -19,6 +24,10 @@ type TabsProps = {
 
 export default function Tabs({ onLogout, toggleTheme }: TabsProps) {
   const theme = useTheme();
+
+  // ==== ✨ O BLOCO 'useEffect' FOI REMOVIDO DESTE ARQUIVO ✨ ====
+  // A lógica agora está no 'authService.ts'
+  // =============================================================
 
   return (
     <Tab.Navigator
@@ -43,7 +52,6 @@ export default function Tabs({ onLogout, toggleTheme }: TabsProps) {
             case "Devs":
               iconName = "people-outline";
               break;
-
             case "Perfil":
               iconName = "person-outline";
               break;
@@ -64,7 +72,7 @@ export default function Tabs({ onLogout, toggleTheme }: TabsProps) {
     >
       <Tab.Screen name="Home" component={Home} />
       <Tab.Screen name="Pátio" component={PatioMapping} />
-      <Tab.Screen name="Filiais" component={FiliaisScreen} />   
+      <Tab.Screen name="Filiais" component={FiliaisScreen} />
       <Tab.Screen name="Mapa" component={RealtimeMap} />
       <Tab.Screen name="Devs" component={Developers} />
       <Tab.Screen name="Perfil">
