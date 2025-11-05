@@ -74,6 +74,12 @@ export default function Profile({ onLogout, toggleTheme }: ProfileProps) {
       title: t('profile.language'), 
       description: t(`languages.${currentLocale}` as 'languages.pt' | 'languages.es') 
     },
+    { 
+      id: 'sobre', 
+      icon: 'information-outline', 
+      title: t('about.title'), 
+      description: t('about.subtitle') 
+    },
   ], [currentLocale, theme.dark]);
   
   const handleListItemPress = (id: string) => {
@@ -86,6 +92,9 @@ export default function Profile({ onLogout, toggleTheme }: ProfileProps) {
         break;
       case 'idioma':
         navigation.navigate('LanguageSettings' as never);
+        break;
+      case 'sobre':
+        navigation.navigate('AboutScreen' as never);
         break;
       default:
         Alert.alert("Ação:", `Navegar para a tela de ${id}.`);

@@ -3,6 +3,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import Profile from "../screens/Profile";
 import AccountSettings from "../screens/AccountSettings";
 import LanguageSettings from "../screens/LanguageSettings";
+import AboutScreen from "../screens/AboutScreen";
 import { useTheme } from "react-native-paper";
 import { t } from "../services/i18n";
 
@@ -51,6 +52,15 @@ export default function ProfileStack({
         options={{
           headerShown: true,
           title: t('profile.language'), 
+        }}
+      />
+
+      <Stack.Screen
+        name="AboutScreen"
+        component={AboutScreen}
+        options={{
+          headerShown: true,
+          title: t('about.title'),
         }}
       />
       

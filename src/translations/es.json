@@ -175,6 +175,15 @@
         "C": "Sector C",
         "D": "Sector D"
       }
+    },
+    "about": {
+      "title": "Sobre la App",
+      "subtitle": "Gestión de Patios",
+      "description": "Esta aplicación fue desarrollada como parte del Challenge para la asignatura de 'Mobile Application Development'.",
+      "buildInfo": "Información de la Versión",
+      "version": "Versión de la App",
+      "commitHash": "Build / Hash",
+      "developers": "Desarrolladores"
     }
   }
 }

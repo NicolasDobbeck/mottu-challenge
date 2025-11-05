@@ -175,6 +175,15 @@
         "C": "Setor C",
         "D": "Setor D"
       }
+    },
+    "about": {
+      "title": "Sobre o App",
+      "subtitle": "Gestão de Pátios",
+      "description": "Este aplicativo foi desenvolvido como parte do Challenge para a disciplina de 'Mobile Application Development'.",
+      "buildInfo": "Informações da Versão",
+      "version": "Versão do App",
+      "commitHash": "Build / Hash",
+      "developers": "Desenvolvedores"
     }
   }
 }
