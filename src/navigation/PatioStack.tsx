@@ -6,10 +6,9 @@ import { t } from '../services/i18n';
 import PatioListScreen from '../screens/PatioListScreen'; 
 import MotoListScreen from '../screens/MotoListScreen';
 
-// Define os parâmetros que uma tela pode passar para outra
 export type PatioStackParamList = {
   PatioList: undefined; 
-  MotoList: { patioId: string; patioName: string }; // A tela de motos recebe o ID e nome do pátio
+  MotoList: { patioId: string; patioName: string };
 };
 
 const Stack = createStackNavigator<PatioStackParamList>();
@@ -34,7 +33,7 @@ export default function PatioStack() {
         name="PatioList"
         component={PatioListScreen}
         options={{
-          title: t('patio.titleStack'), // "Pátios"
+          title: t('patio.titleStack'),
         }}
       />
       <Stack.Screen

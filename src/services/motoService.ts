@@ -1,8 +1,5 @@
 import api from './api';
 
-// ==== 1. INTERFACE 'Moto' ATUALIZADA ====
-// Atualizei esta interface para bater com o 'MotoResponse' do seu backend.
-// Adicionei chassi, idPatio, e idOperador.
 export interface Moto {
   idMoto: string;
   placa: string;
@@ -14,21 +11,17 @@ export interface Moto {
   idOperador: string | null;
 }
 
-// ==== 2. NOVA INTERFACE 'MotoFormData' ====
-// Este é o 'molde' para criar ou atualizar uma moto (baseado no seu MotoRequest)
+
 export interface MotoFormData {
   placa: string;
   modelo: string;
   chassi: string;
   status: 'LIVRE' | 'PROBLEMA' | 'MANUTENCAO';
   setor: 'A' | 'B' | 'C' | 'D';
-  idPatio: string; // Uma moto deve pertencer a um pátio
-  idOperador: string | null; // Podemos mandar 'null'
+  idPatio: string;
+  idOperador: string | null; 
 }
 
-/**
- * Busca TODAS as motos de TODOS os pátios (GET /moto/all)
- */
 export const getMotos = async (): Promise<Moto[]> => {
   try {
     const response = await api.get('/moto/all'); 
@@ -39,11 +32,6 @@ export const getMotos = async (): Promise<Moto[]> => {
   }
 };
 
-// ==== 3. NOVA FUNÇÃO 'getMotosByPatio' ====
-/**
- * Busca apenas as motos de um PÁTIO específico.
- * (GET /patio/{idPatio}/motos)
- */
 export const getMotosByPatio = async (idPatio: string): Promise<Moto[]> => {
   try {
     const response = await api.get(`/patio/${idPatio}/motos`);
@@ -54,12 +42,6 @@ export const getMotosByPatio = async (idPatio: string): Promise<Moto[]> => {
   }
 };
 
-
-// ==== 4. NOVA FUNÇÃO 'createMoto' ====
-/**
- * Cria uma nova moto.
- * (POST /moto)
- */
 export const createMoto = async (motoData: MotoFormData): Promise<Moto> => {
   try {
     // Como combinado, idOperador será null
@@ -71,13 +53,6 @@ export const createMoto = async (motoData: MotoFormData): Promise<Moto> => {
   }
 };
 
-
-// ==== 5. FUNÇÃO 'updateMoto' ATUALIZADA ====
-/**
- * Atualiza os dados de uma moto específica.
- * O backend espera o corpo completo (MotoRequest), por isso usamos MotoFormData.
- * (PUT /moto/{id})
- */
 export const updateMoto = async (motoId: string, motoData: MotoFormData): Promise<Moto> => {
   try {
     const response = await api.put(`/moto/${motoId}`, { ...motoData, idOperador: null });
@@ -88,11 +63,6 @@ export const updateMoto = async (motoId: string, motoData: MotoFormData): Promis
   }
 };
 
-// ==== 6. NOVA FUNÇÃO 'deleteMoto' ====
-/**
- * Deleta uma moto específica.
- * (DELETE /moto/{id})
- */
 export const deleteMoto = async (motoId: string): Promise<void> => {
   try {
     await api.delete(`/moto/${motoId}`);

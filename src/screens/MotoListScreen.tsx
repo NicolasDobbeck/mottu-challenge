@@ -8,7 +8,6 @@ import { Moto, getMotosByPatio, createMoto, updateMoto, deleteMoto, MotoFormData
 import MotoFormModal from '../components/MotoFormModal';
 import { t } from '../services/i18n';
 
-// Constantes de Cor e Setores (do seu PatioMapping original)
 const STATUS_COLORS: Record<string, string> = {
   LIVRE: "#05AF31",
   PROBLEMA: "#FF3B30",
@@ -37,16 +36,12 @@ const MotoListScreen: React.FC = () => {
     queryFn: () => getMotosByPatio(patioId),
   });
 
-  // --- Mutações (CRUD de Motos) ---
   const handleMutationSuccess = () => {
     queryClient.invalidateQueries({ queryKey: ['motos', patioId] });
     setFormModalVisible(false);
     setStatusModalVisible(false);
     setSelectedMoto(null);
   };
-  
-  // (O resto das suas mutações e handlers: create, update, delete, openNewForm, etc.
-  // são os mesmos da minha resposta anterior. Colei abaixo para garantir.)
 
   const handleMutationError = (error: Error, action: string) => {
     const actionT = t(`filiais.error${action.charAt(0).toUpperCase() + action.slice(1)}` as 'filiais.errorCreate');
@@ -60,33 +55,30 @@ const MotoListScreen: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['motos', patioId] });
       setDeleteDialogVisible(false);
       setSelectedMoto(null);
-      setStatusModalVisible(false); // Fecha o modal de status também
+      setStatusModalVisible(false);
       Alert.alert(t('filiais.successDeleteTitle'), t('moto.successDeleteMsg'));
     },
     onError: (err) => handleMutationError(err, 'excluir'),
   });
 
-  // --- Handlers para CRUD e Modais ---
   const openNewForm = () => {
     setSelectedMoto(null); 
     setFormModalVisible(true);
   };
-  
-  // O clique no grid abre o MODAL DE STATUS (seu fluxo original)
+
   const openStatusModal = (moto: Moto) => {
     setSelectedMoto(moto);
     setStatusModalVisible(true);
   };
-  
-  // Abre o formulário de EDIÇÃO (de dentro do modal de status)
+
   const openEditForm = () => {
-    setStatusModalVisible(false); // Fecha o modal de status
-    setFormModalVisible(true);  // Abre o modal de formulário (com a moto já selecionada)
+    setStatusModalVisible(false);
+    setFormModalVisible(true); 
   };
 
   const openDeleteDialog = () => {
-    setStatusModalVisible(false); // Fecha o modal de status
-    setDeleteDialogVisible(true); // Abre o diálogo de deleção
+    setStatusModalVisible(false); 
+    setDeleteDialogVisible(true); 
   };
 
   const confirmDelete = () => {
@@ -95,7 +87,6 @@ const MotoListScreen: React.FC = () => {
     }
   };
 
-  // Handler para o formulário (Criar/Editar)
   const handleSubmitForm = (data: MotoFormData, id?: string) => {
     const dataComPatio = { ...data, idPatio: patioId };
     if (id) {
@@ -104,12 +95,10 @@ const MotoListScreen: React.FC = () => {
       createMutation.mutate(dataComPatio);
     }
   };
-  
-  // Handler para a troca rápida de STATUS
+
   const handleStatusChange = async (newStatus: Moto['status']) => {
     if (!selectedMoto) return;
 
-    // Prepara os dados para o updateMoto (requer o form completo)
     const motoData: MotoFormData = {
       placa: selectedMoto.placa,
       chassi: selectedMoto.chassi,
@@ -127,7 +116,6 @@ const MotoListScreen: React.FC = () => {
     refetch();
   }, [refetch]);
 
-  // --- Renderização ---
   if (isLoading) {
     return (
       <View style={[styles.center, { backgroundColor: theme.colors.background }]}>
@@ -167,7 +155,6 @@ const MotoListScreen: React.FC = () => {
                       styles.bikeSpot,
                       { backgroundColor: STATUS_COLORS[moto.status] || '#808080' },
                     ]}
-                    // CLIQUE: Abre modal de STATUS
                     onPress={() => openStatusModal(moto)}
                   >
                     <Text style={styles.bikeText}>{moto.placa}</Text>
@@ -263,7 +250,6 @@ const MotoListScreen: React.FC = () => {
   );
 };
 
-// Estilos (Combinação do seu PatioMapping antigo + FAB)
 const styles = StyleSheet.create({
   container: { flex: 1 },
   scrollContainer: { flex: 1, paddingHorizontal: 25, paddingTop: 20 },

@@ -38,7 +38,6 @@ export default function Profile({ onLogout, toggleTheme }: ProfileProps) {
 
   const [currentLocale, setCurrentLocale] = useState(i18n.locale);
 
-  // Carrega o idioma salvo no AsyncStorage quando o componente montar
   useFocusEffect(
     React.useCallback(() => {
       const syncLocale = async () => {
@@ -57,8 +56,6 @@ export default function Profile({ onLogout, toggleTheme }: ProfileProps) {
     }, [])
   );
 
-
-  // Estado do Avatar: Tentativa de usar a foto atual do Firebase ou a remota padrão
   const [avatarSource, setAvatarSource] = useState(
     user?.photoURL || DefaultRemoteAvatar
   );

@@ -70,7 +70,6 @@ const PatioListScreen: React.FC = () => {
   const handleSubmit = (data: PatioFormData, id?: string) => { if (id) { updateMutation.mutate({ id, data }); } else { createMutation.mutate(data); } };
   const handleNavigateToMotos = (patio: Patio) => { navigation.navigate('MotoList', { patioId: patio.idPatio, patioName: patio.nome }); };
 
-  // Função para renderizar o conteúdo principal (Lista, Erro ou Loading)
   const renderContent = () => {
     if (isLoading) {
       return (
@@ -119,14 +118,9 @@ const PatioListScreen: React.FC = () => {
   };
 
   return (
-    // O View principal agora SEMPRE renderiza
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      
-      {/* O conteúdo (Lista, Erro, Loading) é renderizado aqui dentro */}
       {renderContent()}
 
-      {/* O FAB agora fica FORA da lógica condicional e aparece mesmo em telas de erro ou vazias */}
-      {/* Ele só fica invisível durante o loading inicial */}
       <FAB
         icon="plus"
         style={[styles.fab, { backgroundColor: theme.colors.primary }]}
@@ -161,9 +155,8 @@ const PatioListScreen: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  // Ajustei o 'center' para funcionar melhor com o ListEmptyComponent
   center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20, textAlign: 'center' },
-  list: { padding: 16, minHeight: '100%' }, // Garante que o "Lista Vazia" fique no centro
+  list: { padding: 16, minHeight: '100%' },
   card: { marginBottom: 16 },
   fab: { position: 'absolute', margin: 16, right: 0, bottom: 0 },
 });

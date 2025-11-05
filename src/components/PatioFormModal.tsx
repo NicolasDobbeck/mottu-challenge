@@ -25,15 +25,12 @@ const PatioFormModal: React.FC<Props> = ({ visible, onClose, onSubmit, patio, is
   const [idFilial, setIdFilial] = useState<string | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
-  // Busca as filiais para o dropdown
-  // Só busca (enabled: true) quando o modal estiver visível
   const { data: filiais, isLoading: isLoadingFiliais } = useQuery<Filial[], Error>({
     queryKey: ['filiais'], 
     queryFn: getFiliais,
     enabled: visible, 
   });
 
-  // Efeito para popular o formulário ao editar
   useEffect(() => {
     if (visible) {
       if (patio) {
@@ -54,7 +51,7 @@ const PatioFormModal: React.FC<Props> = ({ visible, onClose, onSubmit, patio, is
   const validate = (): boolean => {
     const newErrors: { [key: string]: string } = {};
     if (!nome.trim()) newErrors.nome = t('patio.form.nameRequired');
-    if (!descricao.trim()) newErrors.descricao = 'A descrição é obrigatória.'; // (Adicione i18n se quiser)
+    if (!descricao.trim()) newErrors.descricao = 'A descrição é obrigatória.';
     if (!idFilial) newErrors.idFilial = t('patio.form.filialRequired');
     
     setErrors(newErrors);
@@ -69,7 +66,6 @@ const PatioFormModal: React.FC<Props> = ({ visible, onClose, onSubmit, patio, is
     }
   };
 
-  // Formata os dados para o RNPickerSelect
   const filialOptions = (filiais || []).map(filial => ({
     label: filial.nome,
     value: filial.idFilial,
@@ -106,7 +102,6 @@ const PatioFormModal: React.FC<Props> = ({ visible, onClose, onSubmit, patio, is
         />
         {errors.descricao && <Text style={styles.errorText}>{errors.descricao}</Text>}
 
-        {/* --- SUBSTITUIÇÃO DO <Menu> --- */}
         <Text style={[styles.label, { color: theme.colors.onSurfaceVariant }]}>{t('patio.form.filial')}</Text>
         <RNPickerSelect
           placeholder={{ label: t('patio.form.selectFilial'), value: null }}
@@ -118,10 +113,9 @@ const PatioFormModal: React.FC<Props> = ({ visible, onClose, onSubmit, patio, is
             return <Ionicons name="chevron-down" size={24} color={theme.colors.onSurfaceVariant} />;
           }}
           disabled={isLoadingFiliais}
-          useNativeAndroidPickerStyle={false} // Garante o estilo customizado no Android
+          useNativeAndroidPickerStyle={false} 
         />
         {errors.idFilial && <Text style={styles.errorText}>{errors.idFilial}</Text>}
-        {/* --- FIM DA SUBSTITUIÇÃO --- */}
         
         <View style={{ height: 20 }} />
 
@@ -149,7 +143,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   errorText: {
-    color: 'red', // TODO: use theme.colors.error
+    color: 'red',
     marginBottom: 10,
     fontSize: 12,
   },
@@ -164,7 +158,6 @@ const styles = StyleSheet.create({
   }
 });
 
-// Estilos para o RNPickerSelect
 const pickerSelectStyles = (theme: any) => StyleSheet.create({
   inputIOS: {
     fontSize: 16,

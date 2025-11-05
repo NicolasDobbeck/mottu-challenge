@@ -35,13 +35,11 @@ interface Props {
 const MotoFormModal: React.FC<Props> = ({ visible, onClose, onSubmit, moto, isLoading }) => {
   const theme = useTheme();
 
-  // --- CORREÇÃO: Tipagem explícita no useState ---
   const [placa, setPlaca] = useState('');
   const [chassi, setChassi] = useState('');
   const [modelo, setModelo] = useState<MotoFormData['modelo']>(modeloOptions[0].value);
   const [status, setStatus] = useState<MotoFormData['status']>(statusOptions[0].value);
   const [setor, setSetor] = useState<MotoFormData['setor']>(setorOptions[0].value);
-  // --- Fim da Correção ---
   
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   
@@ -76,7 +74,6 @@ const MotoFormModal: React.FC<Props> = ({ visible, onClose, onSubmit, moto, isLo
 
   const handleSubmit = () => {
     if (validate()) {
-      // Agora 'modelo', 'status', e 'setor' têm os tipos corretos
       onSubmit({ placa, chassi, modelo, status, setor, idPatio: '', idOperador: null }, moto?.idMoto);
     } else {
       Alert.alert(t('common.error'), t('patio.form.validationError')); 
@@ -123,7 +120,7 @@ const MotoFormModal: React.FC<Props> = ({ visible, onClose, onSubmit, moto, isLo
           placeholder={{}}
           items={modeloOptions}
           onValueChange={(value) => {
-            if (value) setModelo(value); // Garante que não é null
+            if (value) setModelo(value);
           }}
           value={modelo}
           style={pickerSelectStyles(theme)}
@@ -186,7 +183,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   errorText: {
-    color: 'red', // TODO: use theme.colors.error
+    color: 'red',
     marginBottom: 10,
     fontSize: 12,
   },
@@ -201,7 +198,6 @@ const styles = StyleSheet.create({
   }
 });
 
-// Estilos para o RNPickerSelect
 const pickerSelectStyles = (theme: any) => StyleSheet.create({
   inputIOS: {
     fontSize: 16,

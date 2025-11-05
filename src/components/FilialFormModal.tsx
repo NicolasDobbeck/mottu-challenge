@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Modal, ScrollView, Alert } from 'react-native';
 import { Appbar, TextInput, Button, useTheme, Text, Menu } from 'react-native-paper';
-import { FilialFormData, Filial } from '../services/filialService'; // Importa a interface Filial correta
+import { FilialFormData, Filial } from '../services/filialService';
 import { t } from '../services/i18n';
 
-// Opções para o dropdown de Código do País
 const paisOptions = [
   { label: 'Brasil (BR)', value: 'BR' },
   { label: 'Portugal (PT)', value: 'PT' },
@@ -15,7 +14,7 @@ interface Props {
   visible: boolean;
   onClose: () => void;
   onSubmit: (data: FilialFormData, id?: string) => void;
-  filial?: Filial | null; // Usa a interface Filial
+  filial?: Filial | null;
   isLoading: boolean;
 }
 
@@ -23,7 +22,7 @@ const FilialFormModal: React.FC<Props> = ({ visible, onClose, onSubmit, filial, 
   const theme = useTheme();
   const [nome, setNome] = useState('');
   const [cnpj, setCnpj] = useState('');
-  const [cdPais, setCdPais] = useState(paisOptions[0].value); // Valor padrão
+  const [cdPais, setCdPais] = useState(paisOptions[0].value); 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [menuVisible, setMenuVisible] = useState(false);
 
@@ -33,12 +32,11 @@ const FilialFormModal: React.FC<Props> = ({ visible, onClose, onSubmit, filial, 
       setCnpj(filial.cnpj || '');
       setCdPais(filial.cdPais || paisOptions[0].value);
     } else {
-      // Limpa o formulário ao abrir para criar uma nova filial
       setNome('');
       setCnpj('');
       setCdPais(paisOptions[0].value);
     }
-    setErrors({}); // Limpa os erros sempre que o modal abre ou a filial muda
+    setErrors({});
   }, [filial, visible]);
 
   const validate = (): boolean => {
@@ -46,7 +44,7 @@ const FilialFormModal: React.FC<Props> = ({ visible, onClose, onSubmit, filial, 
     if (!nome.trim()) newErrors.nome = t('filiais.form.nameRequired');
     if (!cnpj.trim()) {
       newErrors.cnpj = t('filiais.form.cnpjRequired');
-    } else if (cnpj.length > 18) { // Ajuste para o formato com máscara (ex: 00.000.000/0000-00)
+    } else if (cnpj.length > 18) {
       newErrors.cnpj = t('filiais.form.cnpjLong');
     }
     setErrors(newErrors);

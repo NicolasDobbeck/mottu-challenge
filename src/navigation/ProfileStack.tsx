@@ -50,7 +50,7 @@ export default function ProfileStack({
         component={LanguageSettings}
         options={{
           headerShown: true,
-          title: t('profile.language'), // Reutiliza a tradução "Idioma"
+          title: t('profile.language'), 
         }}
       />
       
