@@ -5,7 +5,7 @@ import Constants from 'expo-constants'; // Importa a biblioteca que instalamos
 import { t } from '../services/i18n';
 
 const appVersion = Constants.expoConfig?.version || '1.0.0';
-const commitHash = Constants.expoConfig?.android?.versionCode || Constants.expoConfig?.ios?.buildNumber || 'N/A (Somente em build)';
+const commitHash = (Constants as any).expoConfig?.revisionId || 'N/A (Somente em build)';
 
 export default function AboutScreen() {
   const theme = useTheme();
