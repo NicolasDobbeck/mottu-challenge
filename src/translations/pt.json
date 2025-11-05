@@ -118,11 +118,63 @@
       "modalStatus": "Status Atual: %{status}",
       "modalSetor": "Setor: %{setor}",
       "modalChangeStatus": "Alterar status para:",
-      "modalClose": "Fechar"
+      "modalClose": "Fechar",
+      "titleStack": "Pátios",
+      "form": {
+        "titleCreate": "Adicionar Novo Pátio",
+        "titleUpdate": "Editar Pátio",
+        "name": "Nome do Pátio",
+        "nameRequired": "O nome é obrigatório.",
+        "description": "Descrição",
+        "filial": "Filial",
+        "filialRequired": "A filial é obrigatória.",
+        "selectFilial": "Selecione uma filial...",
+        "save": "Salvar",
+        "saving": "Salvando...",
+        "update": "Atualizar",
+        "create": "Criar",
+        "validationError": "Por favor, corrija os erros no formulário."
+      }
     },
     "common": {
       "error": "Erro",
       "attention": "Atenção"
+    },
+    "moto": {
+      "titleStack": "Motos no %{name}",
+      "loading": "A carregar motos...",
+      "empty": "Nenhuma moto encontrada neste pátio.",
+      "subtitle": "Placa: %{placa} | Chassi: %{chassi}",
+      "deleteTitle": "Confirmar Exclusão",
+      "deleteMsg": "Tem a certeza de que deseja excluir a moto de placa \"%{placa}\"? Esta ação não pode ser desfeita.",
+      "successDeleteMsg": "Moto excluída com sucesso.",
+      "form": {
+        "titleCreate": "Adicionar Nova Moto",
+        "titleUpdate": "Editar Moto",
+        "placa": "Placa",
+        "placaRequired": "A placa é obrigatória.",
+        "modelo": "Modelo",
+        "modeloRequired": "O modelo é obrigatório.",
+        "chassi": "Chassi",
+        "chassiRequired": "O chassi é obrigatório.",
+        "status": "Status",
+        "setor": "Setor",
+        "save": "Salvar",
+        "saving": "Salvando...",
+        "update": "Atualizar",
+        "create": "Criar"
+      },
+      "status": {
+        "LIVRE": "Livre",
+        "PROBLEMA": "Problema",
+        "MANUTENCAO": "Manutenção"
+      },
+      "setores": {
+        "A": "Setor A",
+        "B": "Setor B",
+        "C": "Setor C",
+        "D": "Setor D"
+      }
     }
   }
 }

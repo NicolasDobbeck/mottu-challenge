@@ -118,11 +118,63 @@
       "modalStatus": "Estado Actual: %{status}",
       "modalSetor": "Sector: %{setor}",
       "modalChangeStatus": "Cambiar estado para:",
-      "modalClose": "Cerrar"
+      "modalClose": "Cerrar",
+      "titleStack": "Patios",
+      "form": {
+        "titleCreate": "Añadir Nuevo Patio",
+        "titleUpdate": "Editar Patio",
+        "name": "Nombre del Patio",
+        "nameRequired": "El nombre es obligatorio.",
+        "description": "Descripción",
+        "filial": "Filial",
+        "filialRequired": "La filial es obligatoria.",
+        "selectFilial": "Seleccione una filial...",
+        "save": "Guardar",
+        "saving": "Guardando...",
+        "update": "Actualizar",
+        "create": "Crear",
+        "validationError": "Por favor, corrija los errores en el formulario."
+      }
     },
     "common": {
       "error": "Error",
       "attention": "Atención"
+    },
+    "moto": {
+      "titleStack": "Motos en %{name}",
+      "loading": "Cargando motos...",
+      "empty": "No se encontraron motos en este patio.",
+      "subtitle": "Matrícula: %{placa} | Chasis: %{chassi}",
+      "deleteTitle": "Confirmar Eliminación",
+      "deleteMsg": "¿Está seguro de que desea eliminar la moto con matrícula \"%{placa}\"? Esta acción no se puede deshacer.",
+      "successDeleteMsg": "Moto eliminada con éxito.",
+      "form": {
+        "titleCreate": "Añadir Nueva Moto",
+        "titleUpdate": "Editar Moto",
+        "placa": "Matrícula",
+        "placaRequired": "La matrícula es obligatoria.",
+        "modelo": "Modelo",
+        "modeloRequired": "El modelo es obligatorio.",
+        "chassi": "Chasis",
+        "chassiRequired": "El chasis es obligatorio.",
+        "status": "Estado",
+        "setor": "Sector",
+        "save": "Guardar",
+        "saving": "Guardando...",
+        "update": "Actualizar",
+        "create": "Crear"
+      },
+      "status": {
+        "LIVRE": "Libre",
+        "PROBLEMA": "Problema",
+        "MANUTENCAO": "Mantenimiento"
+      },
+      "setores": {
+        "A": "Sector A",
+        "B": "Sector B",
+        "C": "Sector C",
+        "D": "Sector D"
+      }
     }
   }
 }
