@@ -1,14 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { View, Modal, ScrollView, Alert, StyleSheet } from 'react-native';
-import { Appbar, TextInput, Button, useTheme, Text, Menu } from 'react-native-paper';
-import { MotoFormData, Moto } from '../services/motoService'; // Importa as interfaces de Moto
+import { View, Modal, ScrollView, Alert, StyleSheet, Platform } from 'react-native';
+import { Appbar, TextInput, Button, useTheme, Text } from 'react-native-paper';
+import RNPickerSelect from 'react-native-picker-select';
+import { Ionicons } from '@expo/vector-icons';
+import { MotoFormData, Moto } from '../services/motoService';
 import { t } from '../services/i18n';
 
-// --- Opções para os Dropdowns ---
-// (Estas são as chaves. Os valores traduzidos virão do i18n)
-const statusOptions: MotoFormData['status'][] = ["LIVRE", "PROBLEMA", "MANUTENCAO"];
-const setorOptions: MotoFormData['setor'][] = ["A", "B", "C", "D"];
-const modeloOptions: MotoFormData['modelo'][] = ["MOTTUPOP", "MOTTUE", "MOTTUSPORT"]; // Adicionando modelos
+// --- Constantes para os Pickers ---
+const statusOptions = [
+  { label: t('moto.status.LIVRE'), value: 'LIVRE' as 'LIVRE' },
+  { label: t('moto.status.PROBLEMA'), value: 'PROBLEMA' as 'PROBLEMA' },
+  { label: t('moto.status.MANUTENCAO'), value: 'MANUTENCAO' as 'MANUTENCAO' },
+];
+const setorOptions = [
+  { label: t('moto.setores.A'), value: 'A' as 'A' },
+  { label: t('moto.setores.B'), value: 'B' as 'B' },
+  { label: t('moto.setores.C'), value: 'C' as 'C' },
+  { label: t('moto.setores.D'), value: 'D' as 'D' },
+];
+const modeloOptions = [
+  { label: 'MOTTUPOP', value: 'MOTTUPOP' as 'MOTTUPOP' },
+  { label: 'MOTTUE', value: 'MOTTUE' as 'MOTTUE' },
+  { label: 'MOTTUSPORT', value: 'MOTTUSPORT' as 'MOTTUSPORT' },
+];
 
 interface Props {
   visible: boolean;
@@ -21,43 +35,35 @@ interface Props {
 const MotoFormModal: React.FC<Props> = ({ visible, onClose, onSubmit, moto, isLoading }) => {
   const theme = useTheme();
 
-  // --- Estados do Formulário ---
+  // --- CORREÇÃO: Tipagem explícita no useState ---
   const [placa, setPlaca] = useState('');
   const [chassi, setChassi] = useState('');
-  const [modelo, setModelo] = useState(modeloOptions[0]);
-  const [status, setStatus] = useState(statusOptions[0]);
-  const [setor, setSetor] = useState(setorOptions[0]);
+  const [modelo, setModelo] = useState<MotoFormData['modelo']>(modeloOptions[0].value);
+  const [status, setStatus] = useState<MotoFormData['status']>(statusOptions[0].value);
+  const [setor, setSetor] = useState<MotoFormData['setor']>(setorOptions[0].value);
+  // --- Fim da Correção ---
   
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   
-  // Estados para visibilidade dos menus
-  const [modeloMenuVisible, setModeloMenuVisible] = useState(false);
-  const [statusMenuVisible, setStatusMenuVisible] = useState(false);
-  const [setorMenuVisible, setSetorMenuVisible] = useState(false);
-
-  // Efeito para popular o formulário ao editar
   useEffect(() => {
     if (visible) {
       if (moto) {
-        // Modo Edição
         setPlaca(moto.placa || '');
         setChassi(moto.chassi || '');
-        setModelo(moto.modelo || modeloOptions[0]);
-        setStatus(moto.status || statusOptions[0]);
-        setSetor(moto.setor || setorOptions[0]);
+        setModelo(moto.modelo || modeloOptions[0].value);
+        setStatus(moto.status || statusOptions[0].value);
+        setSetor(moto.setor || setorOptions[0].value);
       } else {
-        // Modo Criação (limpa o form)
         setPlaca('');
         setChassi('');
-        setModelo(modeloOptions[0]);
-        setStatus(statusOptions[0]);
-        setSetor(setorOptions[0]);
+        setModelo(modeloOptions[0].value);
+        setStatus(statusOptions[0].value);
+        setSetor(setorOptions[0].value);
       }
       setErrors({});
     }
   }, [moto, visible]);
 
-  // Validação
   const validate = (): boolean => {
     const newErrors: { [key: string]: string } = {};
     if (!placa.trim()) newErrors.placa = t('moto.form.placaRequired');
@@ -70,9 +76,10 @@ const MotoFormModal: React.FC<Props> = ({ visible, onClose, onSubmit, moto, isLo
 
   const handleSubmit = () => {
     if (validate()) {
+      // Agora 'modelo', 'status', e 'setor' têm os tipos corretos
       onSubmit({ placa, chassi, modelo, status, setor, idPatio: '', idOperador: null }, moto?.idMoto);
     } else {
-      Alert.alert(t('common.error'), t('patio.form.validationError')); // Reutiliza chave
+      Alert.alert(t('common.error'), t('patio.form.validationError')); 
     }
   };
 
@@ -88,7 +95,6 @@ const MotoFormModal: React.FC<Props> = ({ visible, onClose, onSubmit, moto, isLo
 
       <ScrollView contentContainerStyle={[styles.container, { backgroundColor: theme.colors.background }]}>
         
-        {/* Campo Placa */}
         <TextInput
           label={t('moto.form.placa')}
           value={placa}
@@ -100,7 +106,6 @@ const MotoFormModal: React.FC<Props> = ({ visible, onClose, onSubmit, moto, isLo
         />
         {errors.placa && <Text style={styles.errorText}>{errors.placa}</Text>}
 
-        {/* Campo Chassi */}
         <TextInput
           label={t('moto.form.chassi')}
           value={chassi}
@@ -113,82 +118,46 @@ const MotoFormModal: React.FC<Props> = ({ visible, onClose, onSubmit, moto, isLo
         {errors.chassi && <Text style={styles.errorText}>{errors.chassi}</Text>}
 
         {/* Dropdown Modelo */}
-        <Menu
-          visible={modeloMenuVisible}
-          onDismiss={() => setModeloMenuVisible(false)}
-          anchor={
-            <Button
-              onPress={() => setModeloMenuVisible(true)}
-              mode="outlined"
-              icon="chevron-down"
-              contentStyle={styles.dropdownButtonContent}
-              style={styles.dropdownButton}
-              labelStyle={{ color: theme.colors.onSurface }}
-            >
-              {t('moto.form.modelo')}: {modelo}
-            </Button>
-          }
-        >
-          {modeloOptions.map(option => (
-            <Menu.Item
-              key={option}
-              onPress={() => { setModelo(option); setModeloMenuVisible(false); }}
-              title={option}
-            />
-          ))}
-        </Menu>
+        <Text style={[styles.label, { color: theme.colors.onSurfaceVariant }]}>{t('moto.form.modelo')}</Text>
+        <RNPickerSelect
+          placeholder={{}}
+          items={modeloOptions}
+          onValueChange={(value) => {
+            if (value) setModelo(value); // Garante que não é null
+          }}
+          value={modelo}
+          style={pickerSelectStyles(theme)}
+          Icon={() => <Ionicons name="chevron-down" size={24} color={theme.colors.onSurfaceVariant} />}
+          useNativeAndroidPickerStyle={false}
+        />
 
         {/* Dropdown Status */}
-        <Menu
-          visible={statusMenuVisible}
-          onDismiss={() => setStatusMenuVisible(false)}
-          anchor={
-            <Button
-              onPress={() => setStatusMenuVisible(true)}
-              mode="outlined"
-              icon="chevron-down"
-              contentStyle={styles.dropdownButtonContent}
-              style={styles.dropdownButton}
-              labelStyle={{ color: theme.colors.onSurface }}
-            >
-              {t('moto.form.status')}: {t(`moto.status.${status}` as 'moto.status.LIVRE')}
-            </Button>
-          }
-        >
-          {statusOptions.map(option => (
-            <Menu.Item
-              key={option}
-              onPress={() => { setStatus(option); setStatusMenuVisible(false); }}
-              title={t(`moto.status.${option}` as 'moto.status.LIVRE')}
-            />
-          ))}
-        </Menu>
+        <Text style={[styles.label, { color: theme.colors.onSurfaceVariant }]}>{t('moto.form.status')}</Text>
+        <RNPickerSelect
+          placeholder={{}}
+          items={statusOptions}
+          onValueChange={(value) => {
+            if (value) setStatus(value);
+          }}
+          value={status}
+          style={pickerSelectStyles(theme)}
+          Icon={() => <Ionicons name="chevron-down" size={24} color={theme.colors.onSurfaceVariant} />}
+          useNativeAndroidPickerStyle={false}
+        />
 
         {/* Dropdown Setor */}
-        <Menu
-          visible={setorMenuVisible}
-          onDismiss={() => setSetorMenuVisible(false)}
-          anchor={
-            <Button
-              onPress={() => setSetorMenuVisible(true)}
-              mode="outlined"
-              icon="chevron-down"
-              contentStyle={styles.dropdownButtonContent}
-              style={styles.dropdownButton}
-              labelStyle={{ color: theme.colors.onSurface }}
-            >
-              {t('moto.form.setor')}: {t(`moto.setores.${setor}` as 'moto.setores.A')}
-            </Button>
-          }
-        >
-          {setorOptions.map(option => (
-            <Menu.Item
-              key={option}
-              onPress={() => { setSetor(option); setSetorMenuVisible(false); }}
-              title={t(`moto.setores.${option}` as 'moto.setores.A')}
-            />
-          ))}
-        </Menu>
+        <Text style={[styles.label, { color: theme.colors.onSurfaceVariant }]}>{t('moto.form.setor')}</Text>
+        <RNPickerSelect
+          placeholder={{}}
+          items={setorOptions}
+          onValueChange={(value) => {
+            if (value) setSetor(value);
+          }}
+          value={setor}
+          style={pickerSelectStyles(theme)}
+          Icon={() => <Ionicons name="chevron-down" size={24} color={theme.colors.onSurfaceVariant} />}
+          useNativeAndroidPickerStyle={false}
+        />
 
         <View style={{ height: 20 }} />
 
@@ -198,7 +167,7 @@ const MotoFormModal: React.FC<Props> = ({ visible, onClose, onSubmit, moto, isLo
           onPress={handleSubmit}
           loading={isLoading}
           disabled={isLoading}
-          style={styles.saveButton}
+          style={[styles.saveButton, { backgroundColor: theme.colors.primary }]}
           labelStyle={{ color: theme.colors.onPrimary }}
         >
           {isLoading ? t('moto.form.saving') : (moto ? t('moto.form.update') : t('moto.form.create'))}
@@ -217,24 +186,56 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   errorText: {
-    color: 'red', // Ajuste para theme.colors.error
+    color: 'red', // TODO: use theme.colors.error
     marginBottom: 10,
     fontSize: 12,
   },
-  dropdownButton: {
-    paddingVertical: 8,
-    borderColor: 'gray', // Ajuste para theme.colors.outline
-    marginTop: 10,
-  },
-  dropdownButtonContent: {
-    justifyContent: 'space-between',
-    flexDirection: 'row-reverse'
+  label: {
+    fontSize: 12,
+    paddingLeft: 12,
+    paddingTop: 10,
   },
   saveButton: {
     paddingVertical: 8,
-    backgroundColor: '#05AF31', // Ajuste para theme.colors.primary
     marginTop: 20,
   }
+});
+
+// Estilos para o RNPickerSelect
+const pickerSelectStyles = (theme: any) => StyleSheet.create({
+  inputIOS: {
+    fontSize: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: theme.colors.outline,
+    borderRadius: theme.roundness,
+    color: theme.colors.onSurface,
+    paddingRight: 30,
+    backgroundColor: theme.colors.surface,
+    marginTop: 5,
+    marginBottom: 10, 
+  },
+  inputAndroid: {
+    fontSize: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 16,
+    borderWidth: 1,
+    borderColor: theme.colors.outline,
+    borderRadius: theme.roundness,
+    color: theme.colors.onSurface,
+    paddingRight: 30,
+    backgroundColor: theme.colors.surface,
+    marginTop: 5,
+    marginBottom: 10,
+  },
+  iconContainer: {
+    top: Platform.OS === 'ios' ? 18 : 22,
+    right: 15,
+  },
+  placeholder: {
+    color: theme.colors.onSurfaceVariant,
+  },
 });
 
 export default MotoFormModal;

@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Modal, ScrollView, Alert, StyleSheet } from 'react-native';
-import { Appbar, TextInput, Button, useTheme, Text, Menu } from 'react-native-paper';
+import { View, Modal, ScrollView, Alert, StyleSheet, Platform } from 'react-native';
+import { Appbar, TextInput, Button, useTheme, Text } from 'react-native-paper';
 import { useQuery } from '@tanstack/react-query';
+import RNPickerSelect from 'react-native-picker-select';
+import { Ionicons } from '@expo/vector-icons';
 
 import { PatioFormData, Patio } from '../services/patioService';
-import { Filial, getFiliais } from '../services/filialService'; // Importa o serviço de Filiais
+import { Filial, getFiliais } from '../services/filialService';
 import { t } from '../services/i18n';
 
 interface Props {
@@ -18,18 +20,17 @@ interface Props {
 const PatioFormModal: React.FC<Props> = ({ visible, onClose, onSubmit, patio, isLoading }) => {
   const theme = useTheme();
   
-  // Estados do formulário
   const [nome, setNome] = useState('');
   const [descricao, setDescricao] = useState('');
   const [idFilial, setIdFilial] = useState<string | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [menuVisible, setMenuVisible] = useState(false);
 
   // Busca as filiais para o dropdown
+  // Só busca (enabled: true) quando o modal estiver visível
   const { data: filiais, isLoading: isLoadingFiliais } = useQuery<Filial[], Error>({
-    queryKey: ['filiais'], // Reutiliza a query key de FiliaisScreen
+    queryKey: ['filiais'], 
     queryFn: getFiliais,
-    enabled: visible,
+    enabled: visible, 
   });
 
   // Efeito para popular o formulário ao editar
@@ -53,7 +54,7 @@ const PatioFormModal: React.FC<Props> = ({ visible, onClose, onSubmit, patio, is
   const validate = (): boolean => {
     const newErrors: { [key: string]: string } = {};
     if (!nome.trim()) newErrors.nome = t('patio.form.nameRequired');
-    if (!descricao.trim()) newErrors.descricao = 'A descrição é obrigatória.'; // (Adicione esta chave ao i18n se quiser)
+    if (!descricao.trim()) newErrors.descricao = 'A descrição é obrigatória.'; // (Adicione i18n se quiser)
     if (!idFilial) newErrors.idFilial = t('patio.form.filialRequired');
     
     setErrors(newErrors);
@@ -68,7 +69,11 @@ const PatioFormModal: React.FC<Props> = ({ visible, onClose, onSubmit, patio, is
     }
   };
 
-  const selectedFilialLabel = filiais?.find(f => f.idFilial === idFilial)?.nome || t('patio.form.selectFilial');
+  // Formata os dados para o RNPickerSelect
+  const filialOptions = (filiais || []).map(filial => ({
+    label: filial.nome,
+    value: filial.idFilial,
+  }));
 
   return (
     <Modal visible={visible} onRequestClose={onClose} animationType="slide">
@@ -101,39 +106,22 @@ const PatioFormModal: React.FC<Props> = ({ visible, onClose, onSubmit, patio, is
         />
         {errors.descricao && <Text style={styles.errorText}>{errors.descricao}</Text>}
 
-        {/* Dropdown de Filiais */}
-        <Menu
-          visible={menuVisible}
-          onDismiss={() => setMenuVisible(false)}
-          anchor={
-            <Button
-              onPress={() => setMenuVisible(true)}
-              mode="outlined"
-              icon="chevron-down"
-              contentStyle={styles.dropdownButtonContent}
-              style={styles.dropdownButton}
-              labelStyle={{ color: theme.colors.onSurface }}
-            >
-              {selectedFilialLabel}
-            </Button>
-          }
-        >
-         {isLoadingFiliais ? (
-           <Menu.Item title={t('auth.loading')} disabled />
-         ) : (
-           filiais?.map(option => (
-             <Menu.Item
-               key={option.idFilial}
-               onPress={() => {
-                 setIdFilial(option.idFilial);
-                 setMenuVisible(false);
-               }}
-               title={option.nome}
-             />
-           ))
-         )}
-        </Menu>
+        {/* --- SUBSTITUIÇÃO DO <Menu> --- */}
+        <Text style={[styles.label, { color: theme.colors.onSurfaceVariant }]}>{t('patio.form.filial')}</Text>
+        <RNPickerSelect
+          placeholder={{ label: t('patio.form.selectFilial'), value: null }}
+          items={filialOptions}
+          onValueChange={(value) => setIdFilial(value)}
+          value={idFilial}
+          style={pickerSelectStyles(theme)}
+          Icon={() => {
+            return <Ionicons name="chevron-down" size={24} color={theme.colors.onSurfaceVariant} />;
+          }}
+          disabled={isLoadingFiliais}
+          useNativeAndroidPickerStyle={false} // Garante o estilo customizado no Android
+        />
         {errors.idFilial && <Text style={styles.errorText}>{errors.idFilial}</Text>}
+        {/* --- FIM DA SUBSTITUIÇÃO --- */}
         
         <View style={{ height: 20 }} />
 
@@ -142,7 +130,7 @@ const PatioFormModal: React.FC<Props> = ({ visible, onClose, onSubmit, patio, is
           onPress={handleSubmit}
           loading={isLoading}
           disabled={isLoading}
-          style={styles.saveButton}
+          style={[styles.saveButton, { backgroundColor: theme.colors.primary }]}
           labelStyle={{ color: theme.colors.onPrimary }}
         >
           {isLoading ? t('patio.form.saving') : (patio ? t('patio.form.update') : t('patio.form.create'))}
@@ -161,22 +149,54 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   errorText: {
-    color: 'red',
+    color: 'red', // TODO: use theme.colors.error
     marginBottom: 10,
     fontSize: 12,
   },
-  dropdownButton: {
-    paddingVertical: 8,
-    borderColor: 'gray',
-  },
-  dropdownButtonContent: {
-    justifyContent: 'space-between',
-    flexDirection: 'row-reverse'
+  label: {
+    fontSize: 12,
+    paddingLeft: 12,
+    paddingTop: 8,
   },
   saveButton: {
     paddingVertical: 8,
-    backgroundColor: '#05AF31',
+    marginTop: 20,
   }
+});
+
+// Estilos para o RNPickerSelect
+const pickerSelectStyles = (theme: any) => StyleSheet.create({
+  inputIOS: {
+    fontSize: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: theme.colors.outline,
+    borderRadius: theme.roundness,
+    color: theme.colors.onSurface,
+    paddingRight: 30,
+    backgroundColor: theme.colors.surface,
+    marginTop: 5,
+  },
+  inputAndroid: {
+    fontSize: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 16,
+    borderWidth: 1,
+    borderColor: theme.colors.outline,
+    borderRadius: theme.roundness,
+    color: theme.colors.onSurface,
+    paddingRight: 30,
+    backgroundColor: theme.colors.surface,
+    marginTop: 5,
+  },
+  iconContainer: {
+    top: Platform.OS === 'ios' ? 18 : 22,
+    right: 15,
+  },
+  placeholder: {
+    color: theme.colors.onSurfaceVariant,
+  },
 });
 
 export default PatioFormModal;
