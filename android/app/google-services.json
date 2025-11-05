@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "737000542758",
+    "project_id": "mottu-codecraftes",
+    "storage_bucket": "mottu-codecraftes.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:737000542758:android:d27ee5870cddd95d954ce7",
+        "android_client_info": {
+          "package_name": "com.dobbeckm.mottuchallenge"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCFxPQuUbgE8tAggLirp-o2Pv_1N2iXbDA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

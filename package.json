@@ -21,7 +21,7 @@
     "@tanstack/react-query-devtools": "^5.90.1",
     "@types/react-navigation": "^3.0.8",
     "axios": "^1.12.2",
-    "expo": "^54.0.10",
+    "expo": "54.0.22",
     "expo-constants": "~18.0.10",
     "expo-device": "~8.0.9",
     "expo-image-picker": "~17.0.8",
@@ -33,7 +33,7 @@
     "firebase": "^12.3.0",
     "i18n-js": "^4.5.1",
     "react": "19.1.0",
-    "react-native": "^0.81.4",
+    "react-native": "0.81.5",
     "react-native-gesture-handler": "~2.28.0",
     "react-native-maps": "1.20.1",
     "react-native-paper": "^5.14.5",
@@ -49,6 +49,7 @@
     "@babel/core": "^7.25.2",
     "@babel/plugin-transform-optional-chaining": "^7.27.1",
     "@types/react": "~19.1.10",
+    "babel-preset-expo": "^54.0.6",
     "typescript": "~5.9.2"
   },
   "private": true
