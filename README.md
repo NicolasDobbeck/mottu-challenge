@@ -14,75 +14,103 @@ Este projeto vai além de um simples sistema de rastreamento; ele representa um 
 
 ##  Funcionalidades Principais
 
-Este projeto foi desenvolvido para oferecer uma solução completa e robusta para o gerenciamento de frotas de motocicletas, com uma interface intuitiva e funcionalidades poderosas.
-
-###  Sistema de Autenticação e Segurança
+#### Sistema de Autenticação e Segurança
 Um sistema de autenticação completo e seguro, utilizando nosso **backend dedicado em conjunto com o Firebase** para garantir a proteção dos dados do usuário.
 
--   **Cadastro de Usuários:** Permite que novos usuários criem uma conta de forma rápida e segura, com validação de dados para garantir a integridade das informações.
--   **Login Seguro:** Autenticação baseada em credenciais, garantindo que apenas usuários autorizados tenham acesso ao sistema.
--   **Logout:** Encerramento seguro da sessão do usuário, protegendo a conta contra acessos não autorizados.
+* **Cadastro e Login:** Sistema de registro e login de usuários com validação de dados e tratamento de erros.
+* **Autenticação JWT:** O login no Firebase gera um token que é trocado por um token JWT do backend, usado para autenticar todas as requisições à API.
+* **Logout:** Encerramento seguro da sessão do usuário.
 
-###  Gerenciamento e Monitoramento do Pátio
-O coração da aplicação, oferecendo uma visão clara e interativa das operações no pátio.
+#### Gerenciamento de Pátios e Motos (CRUD Completo)
+O coração da aplicação, permitindo total controle administrativo sobre pátios e suas respectivas frotas.
 
--   **Visualização do Pátio:** Um mapa esquemático exibe a disposição de todas as motocicletas no pátio, organizadas por setores para facilitar a localização.
--   **Alteração de Status Interativa:** Com um simples toque, é possível alterar o status de cada motocicleta (ex: `Livre`, `Em Manutenção`, `Problema`), atualizando a informação em tempo real para toda a equipe.
--   **Monitoramento em Tempo Real (Simulado):** Uma tela de mapa dinâmico exibe a localização das motocicletas em trânsito, utilizando dados simulados para demonstrar a capacidade de rastreamento da frota.
+* **CRUD de Pátios:** Uma tela dedicada permite Listar, Criar, Editar e Deletar Pátios, associando cada um a uma filial existente.
+* **Mapeamento de Pátio (Grid):** Ao selecionar um pátio, o usuário vê o **Grid de Mapeamento** visual, mostrando todas as motos organizadas por setores (A, B, C, D) e status (Livre, Problema, Manutenção).
+* **CRUD de Motos:** Diretamente da tela do Grid, o usuário pode:
+    * **Adicionar** uma nova moto (via FAB `+`).
+    * **Editar** uma moto existente (clicando nela).
+    * **Deletar** uma moto (clicando e segurando).
+* **Alteração Rápida de Status:** O modal de edição também permite a troca rápida de status (Livre, Problema, Manutenção).
 
-###  Administração de Filiais
-Um módulo administrativo completo para o gerenciamento de filiais, permitindo total controle sobre as unidades da empresa.
+#### Administração de Filiais
+Um módulo administrativo completo para o gerenciamento de filiais.
 
--   **Criar:** Adicionar novas filiais ao sistema.
--   **Ler:** Visualizar uma lista de todas as filiais cadastradas com seus respectivos detalhes.
--   **Atualizar:** Editar as informações de filiais existentes.
--   **Deletar:** Remover filiais que não estão mais em operação.
+* **Criar:** Adicionar novas filiais ao sistema.
+* **Ler:** Visualizar uma lista de todas as filiais cadastradas.
+* **Atualizar:** Editar as informações de filiais existentes.
+* **Deletar:** Remover filiais do sistema.
 
-###  Painel de Controle do Usuário
-Uma área dedicada para que o usuário gerencie suas preferências e informações pessoais.
+#### Notificações Push
+Integração com **Expo Push Notifications** para manter os usuários informados.
 
--   **Gerenciamento de Conta:** O usuário pode visualizar e atualizar suas informações de cadastro, como nome e senha, mantendo seus dados sempre corretos.
--   **Personalização de Tema:** Oferece a opção de alternar entre os temas **Claro (Light Mode)** e **Escuro (Dark Mode)**, proporcionando maior conforto visual e adaptando a interface às preferências do usuário.
+* **Registro de Dispositivo:** Após o login, o app registra o dispositivo do usuário no backend para receber notificações.
+* **Notificações de Ações:** O sistema envia uma notificação push para todos os usuários registrados quando uma nova filial é criada .
 
+#### Painel de Controle e Personalização
+Uma área dedicada para que o usuário gerencie suas preferências e informações.
+
+* **Gerenciamento de Conta:** O usuário pode visualizar e atualizar suas informações de cadastro (nome, senha).
+* **Personalização de Tema:** Suporte completo aos temas **Claro (Light Mode)** e **Escuro (Dark Mode)**.
+* **Internacionalização (i18n):** O aplicativo suporta **Português (pt)** e **Espanhol (es)**, detectando automaticamente o idioma do dispositivo e permitindo a troca manual pelo usuário.
+* **Tela "Sobre o App":** Exibe informações da versão do aplicativo e o **hash do commit** do Git (injetado durante o build `eas build`).
+
+#### Monitoramento (Simulado)
+* **Mapa em Tempo Real:** Uma tela de mapa dinâmico exibe a localização simulada de motocicletas em trânsito, demonstrando a capacidade de rastreamento da frota.
 ```
 .
 ├── .expo/
+├── android/
 ├── assets/
 ├── node_modules/
 ├── src/
 │   ├── components/
 │   │   ├── DevCard.tsx
-│   │   └── FilialFormModal.tsx
+│   │   ├── FilialFormModal.tsx
+│   │   ├── MotoFormModal.tsx
+│   │   └── PatioFormModal.tsx
 │   ├── config/
 │   │   └── firebaseConfig.ts
 │   ├── navigation/
 │   │   ├── AuthStack.tsx
+│   │   ├── PatioStack.tsx
 │   │   ├── ProfileStack.tsx
 │   │   ├── Tabs.tsx
 │   │   └── types.ts
 │   ├── screens/
+│   │   ├── AboutScreen.tsx
 │   │   ├── AccountSettings.tsx
 │   │   ├── Developers.tsx
 │   │   ├── FiliaisScreen.tsx
 │   │   ├── Home.tsx
+│   │   ├── LanguageSettings.tsx
 │   │   ├── Login.tsx
-│   │   ├── PatioMapping.tsx
+│   │   ├── MotoListScreen.tsx
+│   │   ├── PatioListScreen.tsx
 │   │   ├── Profile.tsx
 │   │   ├── RealtimeMap.tsx
 │   │   └── Register.tsx
-│   └── services/
-│       ├── api.ts
-│       ├── authService.ts
-│       ├── filialService.ts
-│       └── motoService.ts
+│   ├── services/
+│   │   ├── api.ts
+│   │   ├── authService.ts
+│   │   ├── filialService.ts
+│   │   ├── i18n.ts
+│   │   ├── motoService.ts
+│   │   ├── notificationService.ts
+│   │   └── patioService.ts
+│   └── translations/
+│       ├── es.json
+│       └── pt.json
 ├── .gitignore
 ├── app.json
 ├── App.tsx
 ├── babel.config.js
+├── eas.json
 ├── index.ts
 ├── package-lock.json
 ├── package.json
-└── react-query.ts
+├── README.md
+├── react-query.ts
+└── tsconfig.json
 ```
 ```bash
 git clone https://github.com/NicolasDobbeck/mottu-challenge.git
@@ -97,5 +125,6 @@ yarn install
 ```bash
 npx expo start
 ```
+
 
 
